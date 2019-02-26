@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -51,7 +51,8 @@ var malusY = 1;
 //setup la force des punch
 var punchForce = 30000;
 //setup la forces des bombes
-var bombForce = 100000;
+var bombForceX = 1000;
+var bombForceY = 300;
 
 
 var game = new Phaser.Game(config);
@@ -174,7 +175,6 @@ function create ()
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
     this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
     //collision entre joueur
     this.physics.add.collider(player1, player2, punch);
 
@@ -182,9 +182,11 @@ function create ()
     this.physics.add.overlap(player1, stars, collectStar, null, this);
     this.physics.add.overlap(player2, stars, collectStar, null, this);
 
-    this.physics.add.collider(player1, bombs, hitBomb, null, this);
-    this.physics.add.collider(player2, bombs, hitBomb, null, this);
-
+    this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(bombs, bombs);
+    this.physics.add.collider(bombs, player1);
+    this.physics.add.collider(bombs, player2, explode);
+    this.physics.add.collider(bombs, stars, explode);
 
 }
 
@@ -242,15 +244,15 @@ function update ()
     if (z.isDown && player2.body.touching.down)
     {
         player2.setVelocityY(veloY/malusY);
-    }/*
-    if (e.isDown){
-        //accélération initial sur l'axe des x
-        player2.setAccelerationX(punchForce)
-        //Créer un variation au cours du temps de l'acceleration
-        setTimeout(() => {player2.setAccelerationX(punchForce/2)}, 250)
-        setTimeout(() => {player2.setAccelerationX(punchForce/3)}, 450)
-        setTimeout(() => {player2.setAccelerationX(0)}, 500)
-    }*/
+    }
+    //créer les bombes 
+    if(this.input.activePointer.justDown){
+        let bomb = bombs.create(player1.x, player1.y, 'bomb');
+        bomb.setBounce(0.8);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(-(player1.x - this.input.activePointer.downX),-(player1.y - this.input.activePointer.downY));
+        bomb.allowGravity = false;
+    }
 }
 
 function punch (player1, player2){
@@ -294,29 +296,36 @@ function collectStar (player, star)
             child.enableBody(true, child.x, 0, true, true);
 
         });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
     }
 }
+//
+//-(player.x - bomb.x),
+//-(player.y - bomb.y),
+//
 
-function hitBomb (player, bomb)
-{
-    this.physics.pause();
-
-    player.setTint(0xff0000);
-
-    player.anims.play('turn');
-
-    gameOver = true;
+function explode (player, bomb){
+    function explose ( victime ){
+        let xForce = bombForceX*((player.x - bomb.x))
+        let yForce = bombForceY*((player.y - bomb.y)/10)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+        victime.setAccelerationX(xForce)
+        victime.setAccelerationY(yForce)
+            //Créer un variation au cours du temps de l'acceleration
+            setTimeout(() => {
+                victime.setAccelerationX(xForce/2)
+                victime.setAccelerationY(yForce/2)
+            }, 250)
+            setTimeout(() => {
+                victime.setAccelerationX(xForce/3)
+                victime.setAccelerationY(yForce/3)
+            ;}, 450)
+            setTimeout(() => {
+                victime.setAccelerationX(0)
+                victime.setAccelerationY(0)
+            }, 500)
+    }
+    explose(player)
+    bomb.disableBody(true,true)
 }
-
 
 </script>
 
