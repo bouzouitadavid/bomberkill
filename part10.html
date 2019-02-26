@@ -51,7 +51,7 @@ var malusY = 1;
 //setup la force des punch
 var punchForce = 30000;
 //setup la forces des bombes
-var bombForceX = 1000;
+var bombForceX = 2000;
 var bombForceY = 300;
 
 
@@ -249,8 +249,8 @@ function update ()
     if(this.input.activePointer.justDown){
         let bomb = bombs.create(player1.x, player1.y, 'bomb');
         bomb.setBounce(0.8);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(-(player1.x - this.input.activePointer.downX),-(player1.y - this.input.activePointer.downY));
+        bomb.setCollideWorldBounds(false);
+        bomb.setVelocity(-(player1.x - this.input.activePointer.downX)*1.5,-(player1.y - this.input.activePointer.downY)*1.5);
         bomb.allowGravity = false;
     }
 }
