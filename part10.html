@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
+    <title>Bomberkill</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -41,13 +41,10 @@ var config = {
 
 var player1;
 var player2;
-var starslet 
 var bombs;
 var platforms;
 var cursors;
-var score = 0;
-var gameOver = false;
-var scoreText = "";
+var camera1;
 ///
 //Paramètres physiques
 //Velocity des joueurs
@@ -68,7 +65,6 @@ function preload ()
 {
     this.load.image('sky', 'assets/PNG/bg_volcano_2000_1500.png');
     this.load.image('ground', 'assets/PNG/volcano_pack_alt_05.png');
-    this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
@@ -140,44 +136,24 @@ function create ()
     d = this.input.keyboard.addKey("d")
     e = this.input.keyboard.addKey("e")
 
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-    stars = this.physics.add.group({
-        key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
-    });
-
-    stars.children.iterate(function (child) {
-
-        //  Give each star a slightly different bounce
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-    });
-
+    //bombs
     bombs = this.physics.add.group();
-
-    //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
-    this.physics.add.collider(stars, platforms);
+    
     //collision entre joueur
     this.physics.add.collider(player1, player2, punch);
-
-    //Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player1, stars, collectStar, null, this);
-    this.physics.add.overlap(player2, stars, collectStar, null, this);
 
     this.physics.add.collider(bombs, platforms);
     this.physics.add.collider(bombs, bombs);
     this.physics.add.collider(bombs, player1);
     this.physics.add.collider(bombs, player2, explode);
-    this.physics.add.collider(bombs, stars, explode);
+    
 
     //camera
-    this.cameras.main.startFollow(player1)
+    camera1 = this.cameras.main.startFollow(player1);
 }
 
 function update ()
@@ -240,7 +216,8 @@ function update ()
         let bomb = bombs.create(player1.x, player1.y, 'bomb');
         bomb.setBounce(0.8);
         bomb.setCollideWorldBounds(false);
-        bomb.setVelocity(-(player1.x - this.input.activePointer.downX)*1.5,-(player1.y - this.input.activePointer.downY)*1.5);
+        console.log(camera1);
+        bomb.setVelocity(-(camera1._width/2 - this.input.activePointer.downX)*1.5,-(camera1._height/2 - this.input.activePointer.downY)*1.5);
         bomb.allowGravity = false;
     }
     if(e.isDown){
@@ -274,24 +251,6 @@ function punch (player1, player2){
     }
 }
 
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-
-    //  Add and update the score
-    score += 10;
-    scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0)
-    {
-        //  A new batch of stars to collect
-        stars.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
-
-        });
-    }
-}
 //
 //-(player.x - bomb.x),
 //-(player.y - bomb.y),
