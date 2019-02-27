@@ -25,7 +25,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 666 },
-            debug: true
+            debug: false
         }
     },
     scene: {
@@ -52,7 +52,7 @@ var scoreText = "";
 //Paramètres physiques
 //Velocity des joueurs
 var veloX = 200;
-var veloY = -700; 
+var veloY = -1000; 
 var malusX = 1;
 var malusY = 1;
 //setup la force des punch
@@ -66,8 +66,9 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'assets/PNG/bg_volcano_2000_1500.png');
+    this.load.image('sky', 'assets/bg_volcano.png');
     this.load.image('ground', 'assets/PNG/volcano_pack_alt_05.png');
+    this.load.image('petitsol', 'assets/PNG/volcano_pack_alt_39.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
@@ -76,8 +77,7 @@ function preload ()
 function create ()
 {
     //  A simple background for our game
-    this.add.image(1280, 720, 'sky');
-    this.add.image(-1280, 720, 'sky');
+    this.add.image(0, 770, 'sky')
     //bgGround = this.add.sprite(100, 750, 'sky');
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -86,13 +86,62 @@ function create ()
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     //first paramètre = longueur // second == hauteur de la platforme
-    platforms.create(100, 900, 'ground').setScale(2).refreshBody();   
+
+
+    // PLATFORME PRINCIPALE 1
+   //for (let i =  i=0; i++){}
+
+    platforms.create(60, 1100, 'ground').refreshBody() ;
+    platforms.create(120, 1100, 'ground').refreshBody();
+    platforms.create(180, 1100, 'ground').refreshBody();
+    platforms.create(240, 1100, 'ground').refreshBody();       
+    platforms.create(300, 1100, 'ground').refreshBody();
+    platforms.create(360, 1100, 'ground').refreshBody();
+    platforms.create(420, 1100, 'ground').refreshBody();       
+    platforms.create(480, 1100, 'ground').refreshBody();
+    platforms.create(540, 1100, 'ground').refreshBody();
+    //PLATEFORME PRINCIPALE 2    
+    platforms.create(900, 1100, 'ground').refreshBody();       
+    platforms.create(960, 1100, 'ground').refreshBody();
+    platforms.create(1020, 1100, 'ground').refreshBody();
+    platforms.create(1080, 1100, 'ground').refreshBody();       
+    platforms.create(1140, 1100, 'ground').refreshBody();
+    platforms.create(1200, 1100, 'ground').refreshBody();
+    platforms.create(1260, 1100, 'ground').refreshBody();       
+    platforms.create(1320, 1100, 'ground').refreshBody();
+    platforms.create(1380, 1100, 'ground').refreshBody();
+    //PLATEFORME PRINCIPALE 3
+    platforms.create(1640, 1100, 'ground').refreshBody();       
+    platforms.create(1700, 1100, 'ground').refreshBody();
+    platforms.create(1760, 1100, 'ground').refreshBody();
+    platforms.create(1820, 1100, 'ground').refreshBody();       
+    platforms.create(1880, 1100, 'ground').refreshBody();
+    platforms.create(1940, 1100, 'ground').refreshBody();
+    platforms.create(2000, 1100, 'ground').refreshBody();       
+    platforms.create(2060, 1100, 'ground').refreshBody();
+    platforms.create(2120, 1100, 'ground').refreshBody();
+
+    //PLATEFORME PREMIERE ETAGE
+    //PLATEFORME GAUCHE    
+    platforms.create(600, 800, 'petitsol');
+    platforms.create(660, 800, 'petitsol');
+    platforms.create(720, 800, 'petitsol');
+    platforms.create(780, 800, 'petitsol');
+    platforms.create(840, 800, 'petitsol');
+
+
+
+
+
+
+
+    
 
     //  plateform centrale
     platforms.create(900, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-    platforms.create(444, 555, 'ground');
+    
 
     // The player and its settings
     player1 = this.physics.add.sprite(100, 600, 'dude');
