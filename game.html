@@ -47,7 +47,7 @@ var cursors;
 var camera1;
   //Potions
 var potions;
-var vie = 100;
+var vie = 5;
 var vieText;
 var mortText;
 
@@ -270,7 +270,6 @@ create(platforms,6,1600,60,1500,'sollave')
     this.physics.add.collider(player1, Lava, burn)
     //camera
     camera1 = this.cameras.main.startFollow(player1);
-    console.log(player1.state)
 
     // Potions
     potions = this.physics.add.group({
@@ -283,15 +282,15 @@ create(platforms,6,1600,60,1500,'sollave')
         child.setBounceY(Phaser.Math.FloatBetween(0.15, 0.35));
     });
     //  The vie
-    vieText = this.add.text(16, 16, 'vie: 100', { fontSize: '32px', fill: 'red' }); 
+    vieText = this.add.text(camera1._width/2, camera1._height/2, 'vie: 5', { fontSize: '32px', fill: 'red' }); 
     // Mort
-    mortText = this.add.text(250,200,'GAME OVER!', { fontSize: '50px', fill: 'red'});
+    mortText = this.add.text(camera1._width/2,camera1._height/2,'GAME OVER!', { fontSize: '50px', fill: 'red'});
     mortText.visible = false;
     //  Collide the player and the potions with the platforms
     this.physics.add.collider(potions, platforms);
     //  Checks to see if the player overlaps with any of the potions, if he does call the collectpotion function
-    this.physics.add.overlap(player, potions, collectpotion, null, this);   ///////////////////////////////////
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    this.physics.add.overlap(player1, potions, collectpotion, null, this);   ///////////////////////////////////
+    this.physics.add.collider(player1, bombs, hitBomb, null, this);
 }
 
 function update ()
@@ -363,7 +362,6 @@ function update ()
         let bomb = bombs.create(player1.x, player1.y, 'bomb');
         bomb.setBounce(0.8);
         bomb.setCollideWorldBounds(false);
-        console.log(camera1);
         bomb.setVelocity(-(camera1._width/2 - this.input.activePointer.downX)*1.5,-(camera1._height/2 - this.input.activePointer.downY)*1.5);
         bomb.allowGravity = false;
         setTimeout(() => {bomb.destroy()}, 3000)
@@ -420,13 +418,18 @@ function explode (player, bomb){
                 victime.setAccelerationX(0)
             }, 500)
     }
+    player.state -=1;
+    vie -= 1;
+    vieText.setText('vie: ' + vie);   
     explose(player)
     bomb.destroy()
 }
 
 function burn (player, lava){
         //function punching 
-        player.state -= 1
+        player.state -= 1;
+        vie -=1;
+        vieText.setText('vie: ' + vie); 
         function lavaRepulse (victime){
         victime.setAccelerationY(lavaForce)
             //Créer un variation au cours du temps de l'acceleration
@@ -437,46 +440,33 @@ function burn (player, lava){
         lavaRepulse(player)
 }
 
-function collectpotion (player, potion)    ////////////////////////////////// toute la fonction
+function collectpotion (player, potion)
 {
     potion.disableBody(true, true);
 
     //  Add and update the vie
-    vie += 20; 
-    vieText.setText('vie: ' + vie);   
+    if(player1.state <5){
+        player1.state += 1; 
+        vie +=1;
+        vieText.setText('vie: ' + vie);   
+    }
+    
     
     if (potions.countActive(true) === 0)
     {
         //  A new batch of potions to collect
         potions.children.iterate(function (child) {
-
             child.enableBody(true, child.x, 0, true, true);
-
         });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
     }
 }
   
 function hitBomb (player, bomb)   ////////////////////////////////
 {
-    vie -=20;
+    player1.state -=1
+    vie -=1;
     vieText.setText('vie: ' + vie); 
-    console.log(player)
-/*     this.physics.pause();
-
-    player.setTint(0xff0000);
-
-    player.anims.play('turn');
-
-    gameOver = true; */
+    
     mort();
 }
   
@@ -485,8 +475,8 @@ function mort ()  ////////////////////////////////////
     if (vie <= 0){
         mortText.visible = true;
         player.body.enable = false;
-        player.x = -15
-        player.y = -15
+        player.x = 0
+        player.y = 0
     }
 }
 
