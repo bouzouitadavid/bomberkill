@@ -45,7 +45,6 @@ var bombs;
 var platforms;
 var cursors;
 var camera1;
-var state = 5;
 ///
 //Paramètres physiques
 //Velocity des joueurs
@@ -175,7 +174,7 @@ create(platforms,6,1600,60,1500,'sollave')
     player1 = this.physics.add.sprite(100, 600, 'dude');
     player1.isDead = "false"
     player1.name = "player1"
-    player1.data = {"state": "5"};
+    player1.state = 5;
 
     //  Player1 physics properties. Give the little guy a slight bounce.
     player1.setBounce(0.1);
@@ -231,6 +230,7 @@ create(platforms,6,1600,60,1500,'sollave')
     player2 = this.physics.add.sprite(200, 600, 'dude');
     player2.isDead = "false"
     player2.name = "player2"
+    player2.state = 5
 
     // Player2 physics properties. Give the little guy a slight bounce.
     player2.setBounce(0.1)
@@ -263,6 +263,7 @@ create(platforms,6,1600,60,1500,'sollave')
     this.physics.add.collider(player1, Lava, burn)
     //camera
     camera1 = this.cameras.main.startFollow(player1);
+    console.log(player1.state)
 }
 
 function update ()
@@ -284,7 +285,7 @@ function update ()
     {
         player1.setVelocityX(-veloX/malusX);
         for (let i = 0; i < 6; i++) {
-            if(state == i){
+            if(player1.state == i){
             player1.anims.play(`left${i}`, true);}    
         }
     }
@@ -292,7 +293,7 @@ function update ()
     {
         player1.setVelocityX(veloX/malusX);
         for (let i = 0; i < 6; i++) {
-            if(state == i){
+            if(player1.state == i){
             player1.anims.play(`right${i}`, true);}    
         }
     }
@@ -300,7 +301,7 @@ function update ()
     {
         player1.setVelocityX(0);
         for (let i = 0; i < 6; i++) {
-            if(state == i){
+            if(player1.state == i){
             player1.anims.play(`turn${i}`);}    
         }
     }
@@ -370,11 +371,6 @@ function punch (player1, player2){
     }
 }
 
-//
-//-(player.x - bomb.x),
-//-(player.y - bomb.y),
-//
-
 function explode (player, bomb){
     function explose ( victime ){
         let xForce = bombForceX*((player.x - bomb.x))
@@ -400,10 +396,9 @@ function explode (player, bomb){
     bomb.destroy()
 }
 
-
 function burn (player, lava){
         //function punching 
-        state -= 1
+        player.state -= 1
         function lavaRepulse (victime){
         victime.setAccelerationY(lavaForce)
             //Créer un variation au cours du temps de l'acceleration
