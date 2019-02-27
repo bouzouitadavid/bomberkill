@@ -45,7 +45,12 @@ var bombs;
 var platforms;
 var cursors;
 var camera1;
-///
+  //Potions
+var potions;
+var vie = 100;
+var vieText;
+var mortText;
+
 //Paramètres physiques
 //Velocity des joueurs
 var veloX = 200;
@@ -81,6 +86,8 @@ function preload ()
     this.load.spritesheet('sticky-run3', 'assets/sticky-run3.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('sticky-run4', 'assets/sticky-run4.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('sticky-run5', 'assets/sticky-run6.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.image('potion', 'assets/potion.png');
+    this.load.image('cross', 'assets/cross1.png');
 }
 
 function create ()
@@ -264,6 +271,27 @@ create(platforms,6,1600,60,1500,'sollave')
     //camera
     camera1 = this.cameras.main.startFollow(player1);
     console.log(player1.state)
+
+    // Potions
+    potions = this.physics.add.group({
+        key: 'potion',
+/*         repeat: 11,
+ */        setXY: { x: Phaser.Math.RND.between(100, 700),}
+            });
+    potions.children.iterate(function (child) {
+        //  Give each potion a slightly different bounce
+        child.setBounceY(Phaser.Math.FloatBetween(0.15, 0.35));
+    });
+    //  The vie
+    vieText = this.add.text(16, 16, 'vie: 100', { fontSize: '32px', fill: 'red' }); 
+    // Mort
+    mortText = this.add.text(250,200,'GAME OVER!', { fontSize: '50px', fill: 'red'});
+    mortText.visible = false;
+    //  Collide the player and the potions with the platforms
+    this.physics.add.collider(potions, platforms);
+    //  Checks to see if the player overlaps with any of the potions, if he does call the collectpotion function
+    this.physics.add.overlap(player, potions, collectpotion, null, this);   ///////////////////////////////////
+    this.physics.add.collider(player, bombs, hitBomb, null, this);
 }
 
 function update ()
@@ -407,6 +435,59 @@ function burn (player, lava){
             setTimeout(() => {victime.setAccelerationY(0)}, 500)
         }
         lavaRepulse(player)
+}
+
+function collectpotion (player, potion)    ////////////////////////////////// toute la fonction
+{
+    potion.disableBody(true, true);
+
+    //  Add and update the vie
+    vie += 20; 
+    vieText.setText('vie: ' + vie);   
+    
+    if (potions.countActive(true) === 0)
+    {
+        //  A new batch of potions to collect
+        potions.children.iterate(function (child) {
+
+            child.enableBody(true, child.x, 0, true, true);
+
+        });
+
+        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+        var bomb = bombs.create(x, 16, 'bomb');
+        bomb.setBounce(1);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bomb.allowGravity = false;
+
+    }
+}
+  
+function hitBomb (player, bomb)   ////////////////////////////////
+{
+    vie -=20;
+    vieText.setText('vie: ' + vie); 
+    console.log(player)
+/*     this.physics.pause();
+
+    player.setTint(0xff0000);
+
+    player.anims.play('turn');
+
+    gameOver = true; */
+    mort();
+}
+  
+function mort ()  ////////////////////////////////////
+ {
+    if (vie <= 0){
+        mortText.visible = true;
+        player.body.enable = false;
+        player.x = -15
+        player.y = -15
+    }
 }
 
 </script>
