@@ -60,6 +60,8 @@ var punchForce = 30000;
 //setup la forces des bombes
 var bombForceX = 2000*2;
 var bombForceY = 500*2;
+//lava force 
+var lavaForce = -1600;
 
 
 var game = new Phaser.Game(config);
@@ -165,15 +167,6 @@ function create ()
 //PLATEFORME BAS DROITE LAVE
 create(platforms,6,1600,60,1500,'sollave')
 
-
-
-
-    
-
-    
-    
-    
-
     // The player and its settings
     player1 = this.physics.add.sprite(100, 600, 'dude');
     player1.isDead = "false"
@@ -256,6 +249,9 @@ create(platforms,6,1600,60,1500,'sollave')
     this.physics.add.collider(bombs, player2, explode);
     this.physics.add.collider(bombs, stars, explode);
 
+    //the floor is lava
+    this.physics.add.collider(player1, Lava, burn);
+    this.physics.add.collider(player2, Lava, burn);
     //camera
     this.cameras.main.startFollow(player1)
 }
@@ -272,9 +268,7 @@ function update ()
             return false
         }
     }
-    //if (!isDead(player1)) {}
-    //if (!isDead(player2)) {}
-    //player 1 controll
+
     if (cursors.left.isDown)
     {
         player1.setVelocityX(-veloX/malusX);
@@ -372,15 +366,11 @@ function collectStar (player, star)
         });
     }
 }
-//
-//-(player.x - bomb.x),
-//-(player.y - bomb.y),
-//
 
 function explode (player, bomb){
     function explose ( victime ){
         let xForce = bombForceX*((player.x - bomb.x))
-        let yForce = bombForceY*((player.y - bomb.y))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+        let yForce = bombForceY*((player.y - bomb.y))  
         victime.setAccelerationX(xForce)
         victime.setAccelerationY(yForce)
             //Créer un variation au cours du temps de l'acceleration
@@ -399,6 +389,19 @@ function explode (player, bomb){
     }
     explose(player)
     bomb.destroy()
+}
+
+function burn (player, lava){
+        //function punching 
+        console.log("outch")
+        function lavaRepulse (victime){
+        victime.setAccelerationY(lavaForce)
+            //Créer un variation au cours du temps de l'acceleration
+            setTimeout(() => {victime.setAccelerationY(lavaForce/2)}, 250)
+            setTimeout(() => {victime.setAccelerationY(lavaForce/3)}, 450)
+            setTimeout(() => {victime.setAccelerationY(0)}, 500)
+        }
+        lavaRepulse(player)
 }
 
 </script>
