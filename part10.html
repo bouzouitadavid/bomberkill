@@ -1,6 +1,7 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+
+<head>
     <meta charset="UTF-8" />
     <title>Bomberkill</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
@@ -10,406 +11,423 @@
         }
     </style>
 </head>
+
 <body>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-let caWidth = window.innerWidth;
-let caHeigth = window.innerHeight;
+        let caWidth = window.innerWidth;
+        let caHeigth = window.innerHeight;
 
-var config = {
-    type: Phaser.AUTO,
-    width: caWidth,
-    height: caHeigth,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 666 },
-            debug: false
+        var config = {
+            type: Phaser.AUTO,
+            width: caWidth,
+            height: caHeigth,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 666 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            },
+            scale: {
+                width: caWidth,
+                height: caHeigth,
+            }
+        };
+
+        var player1;
+        var player2;
+        var bombs;
+        var platforms;
+        var cursors;
+        var camera1;
+        ///
+        //Paramètres physiques
+        //Velocity des joueurs
+        var veloX = 200;
+        var veloY = -650;
+        var malusX = 1;
+        var malusY = 1;
+        //setup la force des punch
+        var punchForce = 30000;
+        //setup la forces des bombes
+        var bombForceX = 2000 * 2;
+        var bombForceY = 500 * 2;
+        //force de la lava 
+        var lavaForce = -1600;
+        //coordonée
+        var deadX = 1050;
+
+
+        var game = new Phaser.Game(config);
+
+        function preload() {
+            this.load.image('sky', 'assets/bg_volcano.png');
+            this.load.image('ground', 'assets/PNG/volcano_pack_alt_05.png');
+            this.load.image('petitsol', 'assets/PNG/volcano_pack_alt_39.png');
+            this.load.image('sollave', 'assets/PNG/volcano_pack_05.png');
+            this.load.image('lavebord', 'assets/PNG/volcano_pack_53.png');
+            this.load.image('lavemid', 'assets/PNG/volcano_pack_54.png');
+            this.load.image('solnoir', 'assets/PNG/volcano_pack_alt_35.png');
+            this.load.image('star', 'assets/star.png');
+            this.load.image('bomb', 'assets/bomb.png');
+            this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+            this.load.spritesheet('sticky-run0', 'assets/sticky-run0.png', { frameWidth: 32, frameHeight: 48 });
+            this.load.spritesheet('sticky-run1', 'assets/sticky-run1.png', { frameWidth: 32, frameHeight: 48 });
+            this.load.spritesheet('sticky-run2', 'assets/sticky-run2.png', { frameWidth: 32, frameHeight: 48 });
+            this.load.spritesheet('sticky-run3', 'assets/sticky-run3.png', { frameWidth: 32, frameHeight: 48 });
+            this.load.spritesheet('sticky-run4', 'assets/sticky-run4.png', { frameWidth: 32, frameHeight: 48 });
+            this.load.spritesheet('sticky-run5', 'assets/sticky-run6.png', { frameWidth: 32, frameHeight: 48 });
         }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    },
-    scale: {
-        width: caWidth,
-        height: caHeigth,
-    }
-};
 
-var player1;
-var player2;
-var bombs;
-var platforms;
-var cursors;
-var camera1;
-///
-//Paramètres physiques
-//Velocity des joueurs
-var veloX = 200;
-var veloY = -650; 
-var malusX = 1;
-var malusY = 1;
-//setup la force des punch
-var punchForce = 30000;
-//setup la forces des bombes
-var bombForceX = 2000*2;
-var bombForceY = 500*2;
-//force de la lava 
-var lavaForce = -1600;
+        function create() {
+            //  A simple background for our game
+            this.add.image(0, 770, 'sky')
+            //bgGround = this.add.sprite(100, 750, 'sky');
+
+            //  The platforms group contains the ground and the 2 ledges we can jump on
+            platforms = this.physics.add.staticGroup();
+            Lava = this.physics.add.staticGroup();
+            //  Here we create the ground.
+            //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+            //first paramètre = longueur // second == hauteur de la platforme
 
 
-var game = new Phaser.Game(config);
-
-function preload ()
-{
-    this.load.image('sky', 'assets/bg_volcano.png');
-    this.load.image('ground', 'assets/PNG/volcano_pack_alt_05.png');
-    this.load.image('petitsol', 'assets/PNG/volcano_pack_alt_39.png');
-    this.load.image('sollave', 'assets/PNG/volcano_pack_05.png');
-    this.load.image('lavebord', 'assets/PNG/volcano_pack_53.png');
-    this.load.image('lavemid', 'assets/PNG/volcano_pack_54.png');
-    this.load.image('solnoir', 'assets/PNG/volcano_pack_alt_35.png');
-    this.load.image('star', 'assets/star.png');
-    this.load.image('bomb', 'assets/bomb.png');
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('sticky-run0', 'assets/sticky-run0.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('sticky-run1', 'assets/sticky-run1.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('sticky-run2', 'assets/sticky-run2.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('sticky-run3', 'assets/sticky-run3.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('sticky-run4', 'assets/sticky-run4.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('sticky-run5', 'assets/sticky-run6.png', { frameWidth: 32, frameHeight: 48 });
-}
-
-function create ()
-{
-    //  A simple background for our game
-    this.add.image(0, 770, 'sky')
-    //bgGround = this.add.sprite(100, 750, 'sky');
-
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = this.physics.add.staticGroup();
-    Lava = this.physics.add.staticGroup();
-    //  Here we create the ground.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    //first paramètre = longueur // second == hauteur de la platforme
+            // PLATFORME PRINCIPALE 1
 
 
-    // PLATFORME PRINCIPALE 1
-   
+            function create(name = platforms, number = 8, coodX = 0, xSpacing = 60, coodY = 0, type = 'ground', scale = 0.5) {
+                for (let i = 0; i < number; i++) {
+                    name.create(coodX, coodY, type).setScale(scale).refreshBody();
+                    coodX += xSpacing;
+                }
+            }
 
-    function create (name=platforms, number=8, coodX=0, xSpacing=60, coodY=0, type='ground'){
-       for (let i=0; i<number; i++){
-           name.create(coodX,coodY,type).setScale(0.5).refreshBody();
-           coodX += xSpacing;
-       }
-   }   
+            function create2(name = platforms, number = 8, coodX = 0, ySpacing = 60, coodY = 0, type = 'ground', scale = 0.5) {
+                for (let i = 0; i < number; i++) {
+                    name.create(coodX, coodY, type).setScale(scale).refreshBody();
+                    coodY += ySpacing;
+                }
+            }
 
-   function create2 (name=platforms, number=8, coodX=0, ySpacing=60, coodY=0, type='ground'){
-       for (let i=0; i<number; i++){
-           name.create(coodX,coodY,type).setScale(0.5).refreshBody();
-           coodY += ySpacing;
-       }
-   }
+            function create3(name = platforms, number = 8, coodX = 0, xSpacing = 60, coodY = 0, type = 'ground') {
+                for (let i = 0; i < number; i++) {
+                    name.create(coodX, coodY, type).setScale(0.3).refreshBody();
+                    coodX += xSpacing;
+                }
+            }
 
-   function create3 (name=platforms, number=8, coodX=0, xSpacing=60, coodY=0, type='ground'){
-       for (let i=0; i<number; i++){
-           name.create(coodX,coodY,type).setScale(0.3).refreshBody();
-           coodX += xSpacing;
-       }
-   }
-   
-   create(platforms,9,60,60,1100,'ground')
+            create(platforms, 9, 60, 60, 1100, 'ground')
 
-   create(platforms,8,900,60,1100,'ground')
+            create(platforms, 8, 900, 60, 1100, 'ground')
 
-   create(platforms,9,1640,60,1100,'ground')
+            create(platforms, 9, 1640, 60, 1100, 'ground')
 
-   create(platforms,5,600,60,800,'ground')
+            create(platforms, 5, 600, 60, 800, 'ground')
+            //la cage 
+            //bas de la cage
+            create(platforms, 8, 1020, 30, 960, 'ground', 0.25)
+            //haut de la cage
+            create(platforms, 8, 1020, 30, 920, 'ground', 0.25)
 
-   create(platforms,5,1440,60,800,'ground')
+            create(platforms, 5, 1440, 60, 800, 'ground')
 
-   create(platforms,5,1000,60,600,'ground')
+            create(platforms, 5, 1000, 60, 600, 'ground')
 
-   create(platforms,5,250,60,500,'ground')
+            create(platforms, 5, 250, 60, 500, 'ground')
 
-   create(platforms,5,1800,60,500,'ground')
+            create(platforms, 5, 1800, 60, 500, 'ground')
 
-   create(platforms,5,300,60,1350,'sollave')
+            create(platforms, 5, 300, 60, 1350, 'sollave')
 
-   create(platforms,5,700,60,1350,'sollave')
+            create(platforms, 5, 700, 60, 1350, 'sollave')
 
-   create(platforms,5,1100,60,1350,'sollave')
+            create(platforms, 5, 1100, 60, 1350, 'sollave')
 
-//BAC à LAVE DROITE
-   create(Lava,9,800,60,1650,'lavemid')
-   create(platforms,9,800,60,1700,'sollave')
-   create2(platforms,1,1344,60,1638,'sollave')
-   create2(platforms,1,1344,60,1700,'solnoir')
-   create2(platforms,1,799,60,1638,'sollave')
-   create2(platforms,1,799,60,1700,'solnoir')
+            //BAC à LAVE DROITE
+            create(Lava, 9, 800, 60, 1650, 'lavemid')
+            create(platforms, 9, 800, 60, 1700, 'sollave')
+            create2(platforms, 1, 1344, 60, 1638, 'sollave')
+            create2(platforms, 1, 1344, 60, 1700, 'solnoir')
+            create2(platforms, 1, 799, 60, 1638, 'sollave')
+            create2(platforms, 1, 799, 60, 1700, 'solnoir')
 
-//BAC à LAVE GAUCHE
-   create(Lava,9,100,60,1650,'lavemid')
-   create(platforms,9,100,60,1700,'sollave')
-   create2(platforms,1,599,60,1638,'sollave')
-   create2(platforms,1,599,60,1700,'solnoir')
-   create2(platforms,1,99,60,1638,'sollave')
-   create2(platforms,1,99,60,1700,'solnoir')
-//BORDURE BAS GAUCHE + plateforme pour remonter  
-   
-   create(platforms,1,-110,60,1350,'sollave')   
-   create(platforms,1,-50,60,1600,'sollave')
-   create(platforms,1,-180,60,1900,'sollave')
-   create(platforms,1,70,60,1900,'sollave')
-   create(platforms,1,-110,60,2100,'sollave')
-   
+            //BAC à LAVE GAUCHE
+            create(Lava, 9, 100, 60, 1650, 'lavemid')
+            create(platforms, 9, 100, 60, 1700, 'sollave')
+            create2(platforms, 1, 599, 60, 1638, 'sollave')
+            create2(platforms, 1, 599, 60, 1700, 'solnoir')
+            create2(platforms, 1, 99, 60, 1638, 'sollave')
+            create2(platforms, 1, 99, 60, 1700, 'solnoir')
+            //BORDURE BAS GAUCHE + plateforme pour remonter  
 
-//PLATEFORME BAS DROITE LAVE
-create(platforms,6,1600,60,1500,'sollave')
+            create(platforms, 1, -110, 60, 1350, 'sollave')
+            create(platforms, 1, -50, 60, 1600, 'sollave')
+            create(platforms, 1, -180, 60, 1900, 'sollave')
+            create(platforms, 1, 70, 60, 1900, 'sollave')
+            create(platforms, 1, -110, 60, 2100, 'sollave')
 
-    // The player and its settings
-    player1 = this.physics.add.sprite(100, 600, 'dude');
-    player1.isDead = "false"
-    player1.name = "player1"
-    player1.state = 5;
 
-    //  Player1 physics properties. Give the little guy a slight bounce.
-    player1.setBounce(0.1);
-    player1.setCollideWorldBounds(false);
+            //PLATEFORME BAS DROITE LAVE
+            create(platforms, 6, 1600, 60, 1500, 'sollave')
 
-    // player2 animation
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
+            // The player and its settings
+            player1 = this.physics.add.sprite(100, 600, 'dude');
+            player1.name = "player1"
+            player1.state = 1;
 
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'dude', frame: 4 } ],
-        frameRate: 20
-    });
+            player1.setBounce(0.1);
+            player1.setCollideWorldBounds(false);
 
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    // player1 animation
-    for (let i = 0; i < 6; i++) {
+            // player2 animation
             this.anims.create({
-            key: `left${i}`,
-            frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 0, end: 3 }),
-            frameRate: 10,
-            repeat: -1
-        });
-    }
-    for (let i = 0; i < 6; i++) {
+                key: 'left',
+                frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+                frameRate: 10,
+                repeat: -1
+            });
+
             this.anims.create({
-            key: `turn${i}`,
-            frames: [ { key: `sticky-run${i}`, frame: 4 } ],
-            frameRate: 20
-        });
-    }
+                key: 'turn',
+                frames: [{ key: 'dude', frame: 4 }],
+                frameRate: 20
+            });
 
-    for (let i = 0; i < 6; i++) {
             this.anims.create({
-            key: `right${i}`,
-            frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 5, end: 8 }),
-            frameRate: 10,
-            repeat: -1
-        });
-    }
-    //Created player 2
-    player2 = this.physics.add.sprite(200, 600, 'dude');
-    player2.isDead = "false"
-    player2.name = "player2"
-    player2.state = 5
+                key: 'right',
+                frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+                frameRate: 10,
+                repeat: -1
+            });
 
-    // Player2 physics properties. Give the little guy a slight bounce.
-    player2.setBounce(0.1)
-    player2.setCollideWorldBounds(false)
+            // player1 animation
+            for (let i = 0; i < 6; i++) {
+                this.anims.create({
+                    key: `left${i}`,
+                    frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+            }
+            for (let i = 0; i < 6; i++) {
+                this.anims.create({
+                    key: `turn${i}`,
+                    frames: [{ key: `sticky-run${i}`, frame: 4 }],
+                    frameRate: 20
+                });
+            }
 
-    //  Input Events
-    cursors = this.input.keyboard.createCursorKeys();
-    z = this.input.keyboard.addKey("z")
-    q = this.input.keyboard.addKey("q")
-    d = this.input.keyboard.addKey("d")
-    e = this.input.keyboard.addKey("e")
+            for (let i = 0; i < 6; i++) {
+                this.anims.create({
+                    key: `right${i}`,
+                    frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 5, end: 8 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+            }
+            //Created player 2
+            player2 = this.physics.add.sprite(200, 600, 'dude');
+            player2.name = "player2"
+            player2.state = 5
 
-    //bombs
-    bombs = this.physics.add.group();
+            // Player2 physics properties. Give the little guy a slight bounce.
+            player2.setBounce(0.1)
+            player2.setCollideWorldBounds(false)
 
-    //  Collide the player and the stars with the platforms
-    this.physics.add.collider(player1, platforms);
-    this.physics.add.collider(player2, platforms);
-    
-    //collision entre joueur
-    this.physics.add.collider(player1, player2, punch);
+            //  Input Events
+            cursors = this.input.keyboard.createCursorKeys();
+            z = this.input.keyboard.addKey("z")
+            q = this.input.keyboard.addKey("q")
+            d = this.input.keyboard.addKey("d")
+            e = this.input.keyboard.addKey("e")
 
-    this.physics.add.collider(bombs, platforms);
-    this.physics.add.collider(bombs, bombs);
-    this.physics.add.collider(bombs, player1);
-    this.physics.add.collider(bombs, player2, explode);
-    
-    //lava and player 
-    this.physics.add.collider(player1, Lava, burn)
-    this.physics.add.collider(player1, Lava, burn)
-    //camera
-    camera1 = this.cameras.main.startFollow(player1);
-    console.log(player1.state)
-}
+            //bombs
+            bombs = this.physics.add.group();
 
-function update ()
-{   
-    //vérifie pour chaque joueur s'il est vivant ou non
-    function isDead (player) {
-        if (player.y > 720){
-            player.isDead = "true"
-            console.log("Is Dead"+player.y)
-            player.disableBody(true, true)
-        } else {
-            return false
+            //  Collide the player and the stars with the platforms
+            this.physics.add.collider(player1, platforms);
+            this.physics.add.collider(player2, platforms);
+
+            //collision entre joueur
+            this.physics.add.collider(player1, player2, punch);
+
+            this.physics.add.collider(bombs, platforms);
+            this.physics.add.collider(bombs, bombs);
+            this.physics.add.collider(bombs, player1);
+            this.physics.add.collider(bombs, player2, explode);
+
+            //lava and player 
+            this.physics.add.collider(player1, Lava, burn)
+            this.physics.add.collider(player1, Lava, burn)
+            //camera
+            camera1 = this.cameras.main.startFollow(player1);
+            console.log(player1.state)
         }
-    }
-    //if (!isDead(player1)) {}
-    //if (!isDead(player2)) {}
-    //player 1 controll
-    if (cursors.left.isDown)
-    {
-        player1.setVelocityX(-veloX/malusX);
-        for (let i = 0; i < 6; i++) {
-            if(player1.state == i){
-            player1.anims.play(`left${i}`, true);}    
-        }
-    }
-    else if (cursors.right.isDown)
-    {
-        player1.setVelocityX(veloX/malusX);
-        for (let i = 0; i < 6; i++) {
-            if(player1.state == i){
-            player1.anims.play(`right${i}`, true);}    
-        }
-    }
-    else
-    {
-        player1.setVelocityX(0);
-        for (let i = 0; i < 6; i++) {
-            if(player1.state == i){
-            player1.anims.play(`turn${i}`);}    
-        }
-    }
-    if (cursors.up.isDown && player1.body.touching.down)
-    {
-        player1.setVelocityY(veloY/malusY);
-    }
-    ///
-    //player 2 controll
-    if (q.isDown) //si on caresse le Q
-    {
-        player2.setVelocityX(-veloX/malusX);
-        player2.anims.play('left', true);
-    }
-    else if (d.isDown) // si on touch THE D
-    {
-        player2.setVelocityX(veloX/malusX);
-        player2.anims.play('right', true);
-    }
-    else
-    {
-        player2.setVelocityX(0);
-        player2.anims.play('turn');
-    }
-    if (z.isDown && player2.body.touching.down)
-    {
-        player2.setVelocityY(veloY/malusY);
-    }
-    //créer les bombes 
-    if(this.input.activePointer.justDown){
-        let bomb = bombs.create(player1.x, player1.y, 'bomb');
-        bomb.setBounce(0.8);
-        bomb.setCollideWorldBounds(false);
-        console.log(camera1);
-        bomb.setVelocity(-(camera1._width/2 - this.input.activePointer.downX)*1.5,-(camera1._height/2 - this.input.activePointer.downY)*1.5);
-        bomb.allowGravity = false;
-        setTimeout(() => {bomb.destroy()}, 3000)
-    }
-    if(e.isDown){
-        console.log("x = "+player1.x)
-        console.log("y = " +player1.y)
-    }
-}
 
-function punch (player1, player2){
-    //function punching 
-    function punching (victime, sens){
-        if (sens == 1){}
-        else if (sens == 2){ punchForce = (-punchForce);}
-        victime.setAccelerationX(punchForce)
-            //Créer un variation au cours du temps de l'acceleration
-            setTimeout(() => {victime.setAccelerationX(punchForce/2)}, 250)
-            setTimeout(() => {victime.setAccelerationX(punchForce/3)}, 450)
-            setTimeout(() => {victime.setAccelerationX(0)}, 500)
-    }
-    if(e.isDown && d.isDown){
-        punching(player1, 1)
-    }
-    else if(e.isDown && q.isDown){
-        punching(player1, 2)
-    }
-    if(cursors.right.isDown && e.isDown){
-        punching(player2, 1)
-    }
-    else if(cursors.left.isDown && e.isDown){
-        punching(player2, 2)
-    }
-}
+        function update() {
+            //vérifie pour chaque joueur s'il est vivant ou non
+            function isDead(player) {
+                if (player.y > 720) {
+                    player.isDead = "true"
+                    console.log("Is Dead" + player.y)
+                    player.disableBody(true, true)
+                } else {
+                    return false
+                }
+            }
 
-function explode (player, bomb){
-    function explose ( victime ){
-        let xForce = bombForceX*((player.x - bomb.x))
-        let yForce = bombForceY*((player.y - bomb.y))                 
-        victime.setAccelerationX(xForce)
-        victime.setAccelerationY(yForce)
-        console.log(victime.name)
-            //Créer un variation au cours du temps de l'acceleration
-            setTimeout(() => {
-                victime.setAccelerationY(0)
-            }, 40)
-            setTimeout(() => {
-                victime.setAccelerationX(xForce/2)
-            }, 250)
-            setTimeout(() => {
-                victime.setAccelerationX(xForce/3)
-            ;}, 450)
-            setTimeout(() => {
-                victime.setAccelerationX(0)
-            }, 500)
-    }
-    explose(player)
-    bomb.destroy()
-}
+            //function gérant les animations en fonction du state
+            function animated(player) {
+                if (cursors.left.isDown) {
+                    player.setVelocityX(-veloX / malusX);
+                    for (let i = 0; i < 6; i++) {
+                        if (player.state == i) {
+                            player.anims.play(`left${i}`, true);
+                        }
+                    }
+                }
+                else if (cursors.right.isDown) {
+                    player.setVelocityX(veloX / malusX);
+                    for (let i = 0; i < 6; i++) {
+                        if (player.state == i) {
+                            player.anims.play(`right${i}`, true);
+                        }
+                    }
+                }
+                else {
+                    player.setVelocityX(0);
+                    for (let i = 0; i < 6; i++) {
+                        if (player.state == i) {
+                            player.anims.play(`turn${i}`);
+                        }
+                    }
+                }
+                if (cursors.up.isDown && player.body.touching.down) {
+                    player.setVelocityY(veloY / malusY);
+                }
+            }
+            //crée les animations pour les joueurs
+            animated(player1)
 
-function burn (player, lava){
-        //function punching 
-        player.state -= 1
-        function lavaRepulse (victime){
-        victime.setAccelerationY(lavaForce)
-            //Créer un variation au cours du temps de l'acceleration
-            setTimeout(() => {victime.setAccelerationY(lavaForce/2)}, 250)
-            setTimeout(() => {victime.setAccelerationY(lavaForce/3)}, 450)
-            setTimeout(() => {victime.setAccelerationY(0)}, 500)
+            //player 2 animation
+            if (q.isDown) //si on caresse le Q
+            {
+                player2.setVelocityX(-veloX / malusX);
+                player2.anims.play('left', true);
+            }
+            else if (d.isDown) // si on touch THE D
+            {
+                player2.setVelocityX(veloX / malusX);
+                player2.anims.play('right', true);
+            }
+            else {
+                player2.setVelocityX(0);
+                player2.anims.play('turn');
+            }
+            if (z.isDown && player2.body.touching.down) {
+                player2.setVelocityY(veloY / malusY);
+            }
+
+            //créer les bombes 
+            if (this.input.activePointer.justDown) {
+                let bomb = bombs.create(player1.x, player1.y, 'bomb');
+                bomb.setBounce(0.8);
+                bomb.setCollideWorldBounds(false);
+                console.log(camera1);
+                bomb.setVelocity(-(camera1._width / 2 - this.input.activePointer.downX) * 1.5, -(camera1._height / 2 - this.input.activePointer.downY) * 1.5);
+                bomb.allowGravity = false;
+                setTimeout(() => { bomb.destroy() }, 3000)
+            }
+            if (e.isDown) {
+                console.log("x = " + player1.x)
+                console.log("y = " + player1.y)
+            }
         }
-        lavaRepulse(player)
-}
 
-</script>
+        function punch(player1, player2) {
+            //function punching 
+            function punching(victime, sens) {
+                if (sens == 1) { }
+                else if (sens == 2) { punchForce = (-punchForce); }
+                victime.setAccelerationX(punchForce)
+                //Créer un variation au cours du temps de l'acceleration
+                setTimeout(() => { victime.setAccelerationX(punchForce / 2) }, 250)
+                setTimeout(() => { victime.setAccelerationX(punchForce / 3) }, 450)
+                setTimeout(() => { victime.setAccelerationX(0) }, 500)
+            }
+            if (e.isDown && d.isDown) {
+                punching(player1, 1)
+            }
+            else if (e.isDown && q.isDown) {
+                punching(player1, 2)
+            }
+            if (cursors.right.isDown && e.isDown) {
+                punching(player2, 1)
+            }
+            else if (cursors.left.isDown && e.isDown) {
+                punching(player2, 2)
+            }
+        }
+
+        function explode(player, bomb) {
+            function explose(victime) {
+                let xForce = bombForceX * ((player.x - bomb.x))
+                let yForce = bombForceY * ((player.y - bomb.y))
+                victime.setAccelerationX(xForce)
+                victime.setAccelerationY(yForce)
+                console.log(victime.name)
+                //Créer un variation au cours du temps de l'acceleration
+                setTimeout(() => {
+                    victime.setAccelerationY(0)
+                }, 40)
+                setTimeout(() => {
+                    victime.setAccelerationX(xForce / 2)
+                }, 250)
+                setTimeout(() => {
+                    victime.setAccelerationX(xForce / 3)
+                        ;
+                }, 450)
+                setTimeout(() => {
+                    victime.setAccelerationX(0)
+                }, 500)
+            }
+            explose(player)
+            bomb.destroy()
+        }
+
+        function burn(player, lava) {
+            //function punching 
+            player.state -= 1
+            function lavaRepulse(victime) {
+                victime.setAccelerationY(lavaForce)
+                //Créer un variation au cours du temps de l'acceleration
+                setTimeout(() => { victime.setAccelerationY(lavaForce / 2) }, 250)
+                setTimeout(() => { victime.setAccelerationY(lavaForce / 3) }, 450)
+                setTimeout(() => { victime.setAccelerationY(0) }, 500)
+            }
+            lavaRepulse(player)
+            mort(player)
+        }
+
+        function mort(player) ////////////////////////////////////
+        {
+            if (player.state <= 0) {
+                
+                player.body.enable = false;
+                player.x = deadX
+                player.y = 940
+                deadX += 30;
+            }
+        }
+
+    </script>
 
 </body>
+
 </html>
