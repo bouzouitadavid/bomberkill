@@ -83,6 +83,7 @@
             this.load.spritesheet('sticky-run5', 'assets/sticky-run6.png', { frameWidth: 32, frameHeight: 48 });
             this.load.image('potion', 'assets/potion.png');
             this.load.image('cross', 'assets/cross1.png');
+            this.load.image('explosion','assets/explosion.png');
         };
         //Element creating
         function create (){
@@ -181,6 +182,18 @@
                     repeat: -1
                 });
             };
+            //animation of death
+            this.anims.create({
+                key: "die",
+                frames: [{key: "cross"}],
+                frameRate:20
+            });
+            //animation of explosion
+            this.anims.create({
+                key: "explosion",
+                frames: [{key: "explosion"}],
+                frameRate:20
+            });
             //define touch 
             cursors = this.input.keyboard.createCursorKeys();
             z = this.input.keyboard.addKey("z");
@@ -206,7 +219,7 @@
             this.physics.add.collider(player1, player2, punch);
             this.physics.add.collider(bombs, platforms);
             this.physics.add.collider(bombs, bombs);
-            this.physics.add.collider(bombs, player1);
+            this.physics.add.collider(bombs, player1, explode);
             this.physics.add.collider(bombs, player2, explode);
             this.physics.add.collider(player1, lava, burn);
             this.physics.add.collider(player2, lava, burn);
@@ -303,7 +316,8 @@
             player.state -=1;
             player.lifeText.setText('vie: ' + player.state);   
             explose(player);
-            bomb.destroy();
+            bomb.anims.play("explosion");
+            setTimeout(()=>bomb.destroy(),50);
             die(player);
         }
         function punch (player1, player2){
@@ -355,13 +369,17 @@
             };
         };
         function die(player){
-            if(player.state<=0){
+            if(player.state<0){
                 player.dieText.visible=true;
                 player.body.enable = false;
                 player.x = 100;
                 player.y = 100;
-                player.state = 5;
+                player.anims.play("die");
                 setTimeout(()=>player.body.enable = true,5000);
+                setTimeout(()=>player.dieText.visible=false,5000);
+                setTimeout(()=>player.state = 5,5000);
+                setTimeout(()=>player.lifeText.setText('vie: ' + player.state),5000);
+                
             };
         };
 
