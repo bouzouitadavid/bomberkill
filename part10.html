@@ -14,10 +14,13 @@
 
 <script type="text/javascript">
 
+let caWidth = window.innerWidth;
+let caHeigth = window.innerHeight;
+
 var config = {
     type: Phaser.AUTO,
-    width: 2560,
-    height: 1440,
+    width: caWidth,
+    height: caHeigth,
     physics: {
         default: 'arcade',
         arcade: {
@@ -29,6 +32,10 @@ var config = {
         preload: preload,
         create: create,
         update: update
+    },
+    scale: {
+        width: caWidth,
+        height: caHeigth,
     }
 };
 
@@ -170,7 +177,7 @@ function create ()
     this.physics.add.collider(bombs, stars, explode);
 
     //camera
-    //this.cameras.main.startFollow(player1)
+    this.cameras.main.startFollow(player1)
 }
 
 function update ()
