@@ -282,7 +282,9 @@ create(platforms,6,1600,60,1500,'sollave')
         child.setBounceY(Phaser.Math.FloatBetween(0.15, 0.35));
     });
     //  The vie
-    vieText = this.add.text(camera1._width/2, camera1._height/2, 'vie: 5', { fontSize: '32px', fill: 'red' }); 
+    vieText = this.add.text(400, 400, 'vie: 5', { fontSize: '32px', fill: 'red' }); 
+    
+    // vieText.cameraOffset.setTo(200, 500);
     // Mort
     mortText = this.add.text(camera1._width/2,camera1._height/2,'GAME OVER!', { fontSize: '50px', fill: 'red'});
     mortText.visible = false;
