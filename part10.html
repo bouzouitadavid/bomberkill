@@ -25,7 +25,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 666 },
-            debug: true
+            debug: false
         }
     },
     scene: {
@@ -50,7 +50,7 @@ var state = 5;
 //Paramètres physiques
 //Velocity des joueurs
 var veloX = 200;
-var veloY = -700; 
+var veloY = -650; 
 var malusX = 1;
 var malusY = 1;
 //setup la force des punch
@@ -64,8 +64,14 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'assets/PNG/bg_volcano_2000_1500.png');
+    this.load.image('sky', 'assets/bg_volcano.png');
     this.load.image('ground', 'assets/PNG/volcano_pack_alt_05.png');
+    this.load.image('petitsol', 'assets/PNG/volcano_pack_alt_39.png');
+    this.load.image('sollave', 'assets/PNG/volcano_pack_05.png');
+    this.load.image('lavebord', 'assets/PNG/volcano_pack_53.png');
+    this.load.image('lavemid', 'assets/PNG/volcano_pack_54.png');
+    this.load.image('solnoir', 'assets/PNG/volcano_pack_alt_35.png');
+    this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('sticky-run0', 'assets/sticky-run0.png', { frameWidth: 32, frameHeight: 48 });
@@ -79,23 +85,98 @@ function preload ()
 function create ()
 {
     //  A simple background for our game
-    this.add.image(1280, 720, 'sky');
-    this.add.image(-1280, 720, 'sky');
+    this.add.image(0, 770, 'sky')
     //bgGround = this.add.sprite(100, 750, 'sky');
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
-
+    Lava = this.physics.add.staticGroup();
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     //first paramètre = longueur // second == hauteur de la platforme
-    platforms.create(100, 900, 'ground').setScale(2).refreshBody();   
 
-    //  plateform centrale
-    platforms.create(900, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
-    platforms.create(444, 555, 'ground');
+
+    // PLATFORME PRINCIPALE 1
+   
+
+    function create (name=platforms, number=8, coodX=0, xSpacing=60, coodY=0, type='ground'){
+       for (let i=0; i<number; i++){
+           name.create(coodX,coodY,type).setScale(0.5).refreshBody();
+           coodX += xSpacing;
+       }
+   }   
+
+   function create2 (name=platforms, number=8, coodX=0, ySpacing=60, coodY=0, type='ground'){
+       for (let i=0; i<number; i++){
+           name.create(coodX,coodY,type).setScale(0.5).refreshBody();
+           coodY += ySpacing;
+       }
+   }
+
+   function create3 (name=platforms, number=8, coodX=0, xSpacing=60, coodY=0, type='ground'){
+       for (let i=0; i<number; i++){
+           name.create(coodX,coodY,type).setScale(0.3).refreshBody();
+           coodX += xSpacing;
+       }
+   }
+   
+   create(platforms,9,60,60,1100,'ground')
+
+   create(platforms,8,900,60,1100,'ground')
+
+   create(platforms,9,1640,60,1100,'ground')
+
+   create(platforms,5,600,60,800,'ground')
+
+   create(platforms,5,1440,60,800,'ground')
+
+   create(platforms,5,1000,60,600,'ground')
+
+   create(platforms,5,250,60,500,'ground')
+
+   create(platforms,5,1800,60,500,'ground')
+
+   create(platforms,5,300,60,1350,'sollave')
+
+   create(platforms,5,700,60,1350,'sollave')
+
+   create(platforms,5,1100,60,1350,'sollave')
+
+//BAC à LAVE DROITE
+   create(Lava,9,800,60,1650,'lavemid')
+   create(platforms,9,800,60,1700,'sollave')
+   create2(platforms,1,1344,60,1638,'sollave')
+   create2(platforms,1,1344,60,1700,'solnoir')
+   create2(platforms,1,799,60,1638,'sollave')
+   create2(platforms,1,799,60,1700,'solnoir')
+
+//BAC à LAVE GAUCHE
+   create(Lava,9,100,60,1650,'lavemid')
+   create(platforms,9,100,60,1700,'sollave')
+   create2(platforms,1,599,60,1638,'sollave')
+   create2(platforms,1,599,60,1700,'solnoir')
+   create2(platforms,1,99,60,1638,'sollave')
+   create2(platforms,1,99,60,1700,'solnoir')
+//BORDURE BAS GAUCHE + plateforme pour remonter  
+   
+   create(platforms,1,-110,60,1350,'sollave')   
+   create(platforms,1,-50,60,1600,'sollave')
+   create(platforms,1,-180,60,1900,'sollave')
+   create(platforms,1,70,60,1900,'sollave')
+   create(platforms,1,-110,60,2100,'sollave')
+   
+
+//PLATEFORME BAS DROITE LAVE
+create(platforms,6,1600,60,1500,'sollave')
+
+
+
+
+    
+
+    
+    
+    
 
     // The player and its settings
     player1 = this.physics.add.sprite(100, 600, 'dude');
