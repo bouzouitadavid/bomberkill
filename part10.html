@@ -337,6 +337,7 @@ function update ()
         console.log(camera1);
         bomb.setVelocity(-(camera1._width/2 - this.input.activePointer.downX)*1.5,-(camera1._height/2 - this.input.activePointer.downY)*1.5);
         bomb.allowGravity = false;
+        setTimeout(() => {bomb.destroy()}, 3000)
     }
     if(e.isDown){
         console.log("x = "+player1.x)
