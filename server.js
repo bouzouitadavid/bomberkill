@@ -46,6 +46,7 @@ io.on('connection', function (socket) {
     // emit a message to all players about the player that moved
     socket.broadcast.emit('playerMoved', players[socket.id]);
   });
+  
     // when a player moves, update the player data
     socket.on('bombMovement', function (movementData) {
       players[socket.id].bombX = movementData.x;

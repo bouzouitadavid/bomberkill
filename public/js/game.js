@@ -267,14 +267,13 @@ function update() {
     var x = this.ship.x;
     var y = this.ship.y;
     var r = this.ship.rotation;
-    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
+    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y)) {
+      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y});
     }
     // save old position data
     this.ship.oldPosition = {
       x: this.ship.x,
       y: this.ship.y,
-      rotation: this.ship.rotation
     };// end emit players
 
   }
