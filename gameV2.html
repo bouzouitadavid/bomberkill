@@ -42,6 +42,8 @@
         let lava;
         let cursors;
         let pointer;
+        let bombSound;
+
         //Physical params
             //Player's Velocity
             let veloX = 200;
@@ -84,12 +86,13 @@
             this.load.image('potion', 'assets/potion.png');
             this.load.image('cross', 'assets/cross1.png');
             this.load.image('explosion','assets/explosion.png');
+            this.load.audio('bombSound','assets/Sound/bombSound.mp3');
         };
         //Element creating
         function create (){
             //Background (sky width = 5120 heigth = 2880)=>(from -2560 to 2560 and from -1440 to 1440)
             this.add.image(0, 0, 'sky');
-            //Platforms
+             //Platforms
                 //classic platforms
                 platforms = this.physics.add.staticGroup();
                 //lava platforms
@@ -118,7 +121,7 @@
                     // createEarth(platforms,1,-50,1600,60,0,'sollave');
                     // createEarth(platforms,1,-180,1900,60,0,'sollave');
                     // createEarth(platforms,1,70,1900,60,0,'sollave');
-                    // createEarth(platforms,1,-110,2100,60,0,'sollave');
+                    // createEarth(platetforms,1,-110,2100,60,0,'sollave');
                     // createEarth(platforms,6,1600,1500,60,0,'sollave');
                     // //Lava box right
                     // createEarth(lava,9,800,1650,60,0,'lavemid');
@@ -225,6 +228,11 @@
             this.physics.add.collider(player2, lava, burn);
             this.physics.add.collider(potions, platforms);
             this.physics.add.overlap(player1, potions, collectpotion, null, this); 
+
+            // Sounds
+                // bomb
+            bombSound = this.sound.add('bombSound');
+            // bombSound.play();
         };
         function update(){
             //Controll player1
@@ -301,8 +309,8 @@
             bomb.setCollideWorldBounds(false);
             bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
             bomb.allowGravity = false;
-            setTimeout(() => bomb.anims.play("explosion"), 4000);
-            setTimeout(() => bomb.destroy(), 4020);
+            /* setTimeout(() => bomb.anims.play("explosion"), 4000);
+            setTimeout(() => bomb.destroy(), 4020); */
         }
         function explode (player, bomb){
             function explose ( victime ){
@@ -328,6 +336,7 @@
             player.lifeText.setText('vie: ' + player.state);   
             explose(player);
             bomb.anims.play("explosion");
+            bombSound.play();
             setTimeout(()=>bomb.destroy(),50);
             die(player);
         }
@@ -335,7 +344,7 @@
             //function punching 
             function punching (victime, sens){
                 if (sens == 1){
-                    punchForce = (depunchForce)
+                    punchForce = (-punchForce)
                 } else if (sens == 2){ 
                     punchForce = (-punchForce)
                 }
