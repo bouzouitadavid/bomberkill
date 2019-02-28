@@ -80,7 +80,7 @@ function preload() {
 }
 
 function addPlayer(self, playerInfo) {
-  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude');
+  self.ship = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
   if (playerInfo.team === 'blue') {
     self.ship.setTint(0x0000ff);
   } else {
@@ -96,25 +96,58 @@ function addPlayer(self, playerInfo) {
   self.ship.setBounce(0.1);
   self.ship.setCollideWorldBounds(false);
   self.physics.add.collider(self.ship, platforms);
+  self.physics.add.collider(self.ship, self.otherPlayer);
+  self.physics.add.collider(self.otherPlayer, self.bomb, explode);
+  self.physics.add.collider(self.ship, self.bomb, explode);
   //Camera for player 1
   camera1 = self.cameras.main.startFollow(self.ship);
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  self.otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
   if (playerInfo.team === 'blue') {
-    otherPlayer.setTint(0x0000ff);
+    self.otherPlayer.setTint(0x0000ff);
   } else {
-    otherPlayer.setTint(0xff0000);
+    self.otherPlayer.setTint(0xff0000);
   }
-  otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
-  self.physics.add.collider(otherPlayer, self);
-  self.physics.add.collider(otherPlayer, platforms);
-  self.physics.add.collider(otherPlayer, self.bombs);
-  
-  
-  
+  self.otherPlayer.playerId = playerInfo.playerId;
+  self.otherPlayers.add(self.otherPlayer);
+  //self.physics.add.collider(otherPlayer, self);
+  self.physics.add.collider(self.otherPlayer, platforms);
+  self.physics.add.collider(self.otherPlayer, self.bombs);
+  self.physics.add.collider(self.otherPlayer, self.ship);
+  self.physics.add.collider(self.otherPlayer, this.bomb, explode);
+}
+
+function explode (bomb, player){
+  console.log("coco")
+  function explose ( victime ){
+      let xForce = bombForceX*((victime.x - bomb.x));
+      let yForce = bombForceY*((victime.y - bomb.y)); 
+      victime.setAccelerationX(xForce);
+      victime.setAccelerationY(yForce);
+          //Créer un variation au cours du temps de l'acceleration
+          setTimeout(() => {
+              victime.setAccelerationY(0)
+          }, 40)
+          setTimeout(() => {
+              victime.setAccelerationX(xForce/2)
+          }, 250)
+          setTimeout(() => {
+              victime.setAccelerationX(xForce/3)
+          }, 450)
+          setTimeout(() => {
+              victime.setAccelerationX(0)
+          }, 500)
+  }
+  player.state -=1;
+  //player.lifeText.setText('vie: ' + player.state);   
+  explose(player);
+  //bomb.anims.play("explosion");
+  // bombSound.volume = 0.2;
+  // bombSound.play();
+  setTimeout(()=>bomb.destroy(),50);
+  // die(player);
 }
 function create() {
               //Background (sky width = 5120 heigth = 2880)=>(from -2560 to 2560 and from -1440 to 1440)
@@ -225,14 +258,15 @@ function update() {
                 bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
                 bomb.allowGravity = false;
                 this.physics.add.collider(bomb, platforms);
-                /* setTimeout(() => bomb.anims.play("explosion"), 4000);
-                setTimeout(() => bomb.destroy(), 4020); */
+                this.physics.add.collider(bomb, ship, explode);
+                //setTimeout(() => bomb.anims.play("explosion"), 4000);
+                setTimeout(() => bomb.destroy(), 4020);
                     // emit player movement
                     this.socket.emit('bombMovement', { bombX: bomb.x, bombY: bomb.y});
           }
 
 
-            
+            console.log(this.ship)
            //Controll player1
            if (this.cursors.left.isDown){
             this.ship.setVelocityX(-veloX/malusX);
