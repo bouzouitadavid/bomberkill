@@ -53,16 +53,24 @@
 var game = new Phaser.Game(config);
 
 function preload() {
-  this.load.image('ship', 'assets/spaceShips_001.png');
-  this.load.image('otherPlayer', 'assets/enemyBlack5.png');
-  this.load.image('star', 'assets/star_gold.png');
   this.load.image('sky', 'assets/bg_volcano.png');
   this.load.image('ground', 'assets/PNG/volcano_pack_alt_05.png');
+  this.load.image('solnoir', 'assets/PNG/volcano_pack_alt_35.png');
   this.load.image('petitsol', 'assets/PNG/volcano_pack_alt_39.png');
   this.load.image('sollave', 'assets/PNG/volcano_pack_05.png');
   this.load.image('lavebord', 'assets/PNG/volcano_pack_53.png');
   this.load.image('lavemid', 'assets/PNG/volcano_pack_54.png');
-  this.load.image('solnoir', 'assets/PNG/volcano_pack_alt_35.png');
+  this.load.image('pievio', 'assets/PNG/volcano_pack_56.png');
+  this.load.image('arbre', 'assets/PNG/volcano_pack_59.png');
+  this.load.image('piejau', 'assets/PNG/volcano_pack_65.png');
+  this.load.image('plantejaune', 'assets/PNG/volcano_pack_66.png');
+  this.load.image('volcan', 'assets/PNG/volcano_pack_68.png');
+  this.load.image('herbe', 'assets/PNG/volcano_pack_69.png');
+  this.load.image('quartz1', 'assets/PNG/volcano_pack_70.png');
+  this.load.image('quartz2', 'assets/PNG/volcano_pack_71.png');
+  this.load.image('piebleu', 'assets/PNG/volcano_pack_72.png');
+  this.load.image('troncmort', 'assets/PNG/volcano_pack_73.png');
+  this.load.image('plantpie', 'assets/PNG/volcano_pack_74.png');
   this.load.image('star', 'assets/star.png');
   this.load.image('bomb', 'assets/bomb.png');
   this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
@@ -81,11 +89,6 @@ function preload() {
 
 function addPlayer(self, playerInfo) {
   self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude');
-  if (playerInfo.team === 'blue') {
-    self.ship.setTint(0x0000ff);
-  } else {
-    self.ship.setTint(0xff0000);
-  }
   // congif player/ship
   self.physics.add.collider(self.ship, self.bomb);
   self.ship.isDead = "false";
@@ -102,11 +105,6 @@ function addPlayer(self, playerInfo) {
 
 function addOtherPlayers(self, playerInfo) {
   const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
-  if (playerInfo.team === 'blue') {
-    otherPlayer.setTint(0x0000ff);
-  } else {
-    otherPlayer.setTint(0xff0000);
-  }
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
   self.physics.add.collider(otherPlayer, self);
@@ -122,48 +120,68 @@ function create() {
               //Platforms
                   //classic platforms
                   platforms = this.physics.add.staticGroup();
+                  decor = this.physics.add.staticGroup();
                   //lava platforms
                   lava = this.physics.add.staticGroup();
                       //Function to generate platforms
-                      function createEarth (name, number, coodX, coodY, xSpacing, ySpacing, type){
+                      function createEarth (name, number, coodX, coodY, xSpacing, ySpacing, type, scale=0.5){
                           for (let i=0; i<number; i++){
-                              name.create(coodX,coodY,type).setScale(0.5).refreshBody();
+                              name.create(coodX,coodY,type).setScale(scale).refreshBody();
                               coodX += xSpacing;
                               coodY += ySpacing;
                           };
                       };   
                       //Generate earth platforms
-                      createEarth(platforms,100,-2500,300,60,0,'ground');
-                      // createEarth(platforms,8,900,1100,60,0,'ground');
-                      // createEarth(platforms,9,1640,1100,60,0,'ground');
-                      // createEarth(platforms,5,600,800,60,0,'ground');
-                      // createEarth(platforms,5,1440,800,60,0,'ground');
-                      // createEarth(platforms,5,1000,600,60,0,'ground');
-                      // createEarth(platforms,5,250,500,60,0,'ground');
-                      // createEarth(platforms,5,1800,500,60,0,'ground');
-                      // createEarth(platforms,5,300,1350,60,0,'sollave');
-                      // createEarth(platforms,5,700,1350,60,0,'sollave');
-                      // createEarth(platforms,5,1100,1350,60,0,'sollave');
-                      // createEarth(platforms,1,-110,1350,60,0,'sollave');   
-                      // createEarth(platforms,1,-50,1600,60,0,'sollave');
-                      // createEarth(platforms,1,-180,1900,60,0,'sollave');
-                      // createEarth(platforms,1,70,1900,60,0,'sollave');
-                      // createEarth(platforms,1,-110,2100,60,0,'sollave');
-                      // createEarth(platforms,6,1600,1500,60,0,'sollave');
-                      // //Lava box right
-                      // createEarth(lava,9,800,1650,60,0,'lavemid');
-                      // createEarth(platforms,9,800,1700,60,0,'sollave');
-                      // createEarth(platforms,1,1344,1638,0,60,'sollave');
-                      // createEarth(platforms,1,1344,17000,0,6,'solnoir');
-                      // createEarth(platforms,1,799,1638,0,60,'sollave');
-                      // createEarth(platforms,1,799,1700,0,60,'solnoir');
-                      // //Lava box left
-                      // createEarth(lava,9,100,1650,60,0,'lavemid');
-                      // createEarth(platforms,9,100,1700,60,0,'sollave');
-                      // createEarth(platforms,1,599,1638,0,60,'sollave');
-                      // createEarth(platforms,1,599,1700,0,60,'solnoir');
-                      // createEarth(platforms,1,99,1638,0,60,'sollave');
-                      // createEarth(platforms,1,99,1700,0,60,'solnoir');
+                      createEarth(platforms,9,-240,300,60,0,'ground'); // PLATEFORME PRINCIPALE MILIEU                    
+                      createEarth(platforms,8,500,300,60,0,'ground'); // PLATEFORME PRINCIPALE DROITE 
+                      createEarth(platforms,9,-1000,300,60,0,'ground'); // PLATEFORME PRINCIPALE GAUCHE
+                      createEarth(platforms,5,-500,0,60,0,'ground'); // PLATEFORME 1 ER ETAGE GAUCHE
+                      createEarth(platforms,5,250,0,60,0,'ground'); // PLATEFORME 1 ER ETAGE DROITE
+                      createEarth(platforms,8,-1000,-200,60,0,'ground'); // PLATEFORME 2 EME ETAGE GAUCHE
+                      createEarth(platforms,4,-1000,-200,0,-60,'ground'); // PLATEFORME 2 EME ETAGE GAUCHE
+                      createEarth(platforms,2,-938,-380,60,-0,'ground'); // PLATEFORME 2 EME ETAGE GAUCHE
+                      createEarth(platforms,8,600,-200,60,0,'ground'); // PLATEFORME 2 EME ETAGE DROITE
+                      createEarth(platforms,4,1050,-200,0,-60,'ground'); // PLATEFORME 2 EME ETAGE DROITE
+                      createEarth(platforms,2,1000,-380,-60,0,'ground'); // PLATEFORME 2 EME ETAGE DROITE
+                      //BAC à lave droite
+                      createEarth(platforms,9,270,700,60,0,'sollave');
+                      createEarth(lava,9,270,650,60,0,'lavemid');
+                      createEarth(platforms,1,220,576,0,60,'sollave');
+                      createEarth(platforms,2,220,640,0,60,'solnoir');
+                      createEarth(platforms,1,800,576,0,60,'sollave');
+                      createEarth(platforms,2,800,640,0,60,'solnoir');
+                      // BAC à lave gauche                             
+                      createEarth(platforms,9,-500,700,60,0,'sollave');
+                      createEarth(lava,9,-500,650,60,0,'lavemid');
+                      createEarth(platforms,1,-564,576,0,60,'sollave');
+                      createEarth(platforms,2,-564,640,0,60,'solnoir');
+                      createEarth(platforms,1,0,576,0,60,'sollave');
+                      createEarth(platforms,2,0,640,0,60,'solnoir');
+                      //ESCALIER BAS GAUCHE
+                      createEarth(platforms,6,-564,550,-60,40,'sollave');
+                      createEarth(platforms,7,-850,750,-60,0,'sollave');
+                      createEarth(platforms,4,-1250,500,-60,0,'sollave');
+                      // PLATEFORME MAISON + MAISO
+                      createEarth(platforms,15,-400,-400,60,0,'ground'); // PLATEFORME MAISON
+                      //DECO                    
+                      createEarth(decor,3 ,-170 ,145 ,190 ,0, 'arbre',1);
+                      createEarth(decor,1, 700, 210, 0, 0, 'arbre');
+                      createEarth(decor,1, 905, 175, 0, 0, 'plantpie',1.5);
+                      createEarth(decor,1,-600, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-650, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-700, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-800, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-850, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-800, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-950, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-900, 240, 0, 0, 'herbe');
+                      createEarth(decor,1,-900, -290, 0, 0, 'quartz1',1);
+                      createEarth(decor,1,-850, -290, 0, 0, 'quartz2',1);
+                      createEarth(decor,3,-1150, 670, 30, 0, 'piejau',0.75);
+                      createEarth(decor,3,-950, 670, 30, 0, 'pievio',0.75);
+                      createEarth(decor,3,260, -65, 110, 0, 'plantejaune',0.75);
+                      createEarth(decor,3,-450,-90,60,0,'herbe',1);
+                      createEarth(decor,2,-150,-620,350,0,'volcan',3.0);
 
 
   var self = this;
