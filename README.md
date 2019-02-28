@@ -1,2 +1,0 @@
-# bomberkill
-game .js
