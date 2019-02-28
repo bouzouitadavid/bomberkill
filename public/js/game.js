@@ -207,22 +207,22 @@ function addOtherPlayers(self, playerInfo) {
 function update() {
   pointer = this.input.activePointer;
   ship = this.ship;
-                      //create bombs (gun)
-                      function fire(ship){
-                        let bomb = bombs.create(ship.x, ship.y, 'bomb');
-                        bomb.setBounce(0.8);
-                        bomb.setCollideWorldBounds(false);
-                        bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
-                        bomb.allowGravity = false;
-                        /* setTimeout(() => bomb.anims.play("explosion"), 4000);
-                        setTimeout(() => bomb.destroy(), 4020); */
-                    }  
+
 
   if (this.ship) {
             //fire a bomb
           if(pointer.justDown){
-              fire(ship);
+                let bomb = this.bombs.create(ship.x, ship.y, 'bomb');
+                bomb.setBounce(0.8);
+                bomb.setCollideWorldBounds(false);
+                bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
+                bomb.allowGravity = false;
+                /* setTimeout(() => bomb.anims.play("explosion"), 4000);
+                setTimeout(() => bomb.destroy(), 4020); */
+                    // emit player movement
+                    this.socket.emit('bombMovement', { bombX: bomb.x, bombY: bomb.y});
           }
+
 
             
            //Controll player1
