@@ -79,6 +79,43 @@ function preload() {
 
 }
 
+function addPlayer(self, playerInfo) {
+  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude');
+  if (playerInfo.team === 'blue') {
+    self.ship.setTint(0x0000ff);
+  } else {
+    self.ship.setTint(0xff0000);
+  }
+  // congif player/ship
+  self.physics.add.collider(self.ship, self.bomb);
+  self.ship.isDead = "false";
+  self.ship.name = "player1";
+  self.ship.state = 5;
+  self.ship.x = 0;
+  self.ship.y = 0;
+  self.ship.setBounce(0.1);
+  self.ship.setCollideWorldBounds(false);
+  self.physics.add.collider(self.ship, platforms);
+  //Camera for player 1
+  camera1 = self.cameras.main.startFollow(self.ship);
+}
+
+function addOtherPlayers(self, playerInfo) {
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  if (playerInfo.team === 'blue') {
+    otherPlayer.setTint(0x0000ff);
+  } else {
+    otherPlayer.setTint(0xff0000);
+  }
+  otherPlayer.playerId = playerInfo.playerId;
+  self.otherPlayers.add(otherPlayer);
+  self.physics.add.collider(otherPlayer, self);
+  self.physics.add.collider(otherPlayer, platforms);
+  self.physics.add.collider(otherPlayer, self.bombs);
+  
+  
+  
+}
 function create() {
               //Background (sky width = 5120 heigth = 2880)=>(from -2560 to 2560 and from -1440 to 1440)
               this.add.image(0, 0, 'sky');
@@ -171,40 +208,10 @@ function create() {
 
   this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
-
 }
 
-function addPlayer(self, playerInfo) {
-  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude');
-  if (playerInfo.team === 'blue') {
-    self.ship.setTint(0x0000ff);
-  } else {
-    self.ship.setTint(0xff0000);
-  }
-  // congif player/ship
-  self.ship.isDead = "false";
-  self.ship.name = "player1";
-  self.ship.state = 5;
-  self.ship.setBounce(0.1);
-  self.ship.setCollideWorldBounds(false);
-  self.physics.add.collider(self.ship, platforms);
-  //Camera for player 1
-  camera1 = self.cameras.main.startFollow(self.ship);
-}
-
-function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
-  if (playerInfo.team === 'blue') {
-    otherPlayer.setTint(0x0000ff);
-  } else {
-    otherPlayer.setTint(0xff0000);
-  }
-  otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
-  self.physics.add.collider(otherPlayer, platforms);
-  
-}
 function update() {
+  
   pointer = this.input.activePointer;
   ship = this.ship;
 
@@ -217,6 +224,7 @@ function update() {
                 bomb.setCollideWorldBounds(false);
                 bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
                 bomb.allowGravity = false;
+                this.physics.add.collider(bomb, platforms);
                 /* setTimeout(() => bomb.anims.play("explosion"), 4000);
                 setTimeout(() => bomb.destroy(), 4020); */
                     // emit player movement
@@ -252,8 +260,7 @@ function update() {
         {
           this.ship.setVelocityY(veloY/malusY);
         };
-  
-    this.physics.world.wrap(this.ship, 5);
+
 
 
     // emit player movement

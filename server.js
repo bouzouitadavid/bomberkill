@@ -17,13 +17,13 @@ io.on('connection', function (socket) {
   // create a new player and add it to our players object
   players[socket.id] = {
     rotation: 0,
-    x: Math.floor(Math.random() * 700) + 50,
-    y: Math.floor(Math.random() * 500) + 50,
+    x: "",
+    y: "",
     bombY: "",
     bombX: "",
 
     playerId: socket.id,
-    team: (Math.floor(Math.random() * 2) == 0) ? 'red' : 'blue'
+    team: 'red', //(Math.floor(Math.random() * 2) == 0) ? 'red' : 'blue'
   };
   // send the players object to the new player
   socket.emit('currentPlayers', players);
