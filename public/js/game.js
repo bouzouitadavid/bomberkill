@@ -171,19 +171,7 @@ function create() {
 
   this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
-  
-  this.socket.on('scoreUpdate', function (scores) {
-    self.blueScoreText.setText('Blue: ' + scores.blue);
-    self.redScoreText.setText('Red: ' + scores.red);
-  });
 
-  this.socket.on('starLocation', function (starLocation) {
-    if (self.star) self.star.destroy();
-    self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
-    self.physics.add.overlap(self.ship, self.star, function () {
-      this.socket.emit('starCollected');
-    }, null, self);
-  });
 }
 
 function addPlayer(self, playerInfo) {
@@ -193,8 +181,6 @@ function addPlayer(self, playerInfo) {
   } else {
     self.ship.setTint(0xff0000);
   }
-
-
   // congif player/ship
   self.ship.isDead = "false";
   self.ship.name = "player1";
@@ -205,17 +191,7 @@ function addPlayer(self, playerInfo) {
   //Camera for player 1
   camera1 = self.cameras.main.startFollow(self.ship);
 }
-function addBombs(self, playerInfo) {
-  self.bomb = self.physics.add.image(playerInfo.x, playerInfo.y, 'bomb');
-  if (playerInfo.team === 'blue') {
-    self.ship.setTint(0x0000ff);
-  } else {
-    self.ship.setTint(0xff0000);
-  }
 
-    self.physics.add.collider(self.bomb, platforms);
-
-  }
 function addOtherPlayers(self, playerInfo) {
   const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
   if (playerInfo.team === 'blue') {
@@ -231,17 +207,16 @@ function addOtherPlayers(self, playerInfo) {
 function update() {
   pointer = this.input.activePointer;
   ship = this.ship;
-  console.log(this.bombs)
                       //create bombs (gun)
                       function fire(ship){
-                        let bomb = this.bombs.create(ship.x, ship.y, 'bomb');
+                        let bomb = bombs.create(ship.x, ship.y, 'bomb');
                         bomb.setBounce(0.8);
                         bomb.setCollideWorldBounds(false);
                         bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
                         bomb.allowGravity = false;
-                        setTimeout(() => bomb.anims.play("explosion"), 4000);
-                        setTimeout(() => bomb.destroy(), 4020);
-                    }    
+                        /* setTimeout(() => bomb.anims.play("explosion"), 4000);
+                        setTimeout(() => bomb.destroy(), 4020); */
+                    }  
 
   if (this.ship) {
             //fire a bomb
@@ -295,20 +270,6 @@ function update() {
       rotation: this.ship.rotation
     };// end emit players
 
-    console.log(this)
-    // emit bombs movement
-    var x = this.ship.x;
-    var y = this.ship.y;
-    var r = this.ship.rotation;
-    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
-    }
-    // save old position data
-    this.ship.oldPosition = {
-      x: this.ship.x,
-      y: this.ship.y,
-      rotation: this.ship.rotation
-    }; // end bombs movement
   }
               //Define collision
               
