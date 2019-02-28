@@ -43,6 +43,7 @@
         let cursors;
         let pointer;
         let bombSound;
+        let music; 
 
         //Physical params
             //Player's Velocity
@@ -87,6 +88,8 @@
             this.load.image('cross', 'assets/cross1.png');
             this.load.image('explosion','assets/explosion.png');
             this.load.audio('bombSound','assets/Sound/bombSound.wav');
+            this.load.audio('music','assets/Sound/music.mp3');
+
         };
         //Element creating
         function create (){
@@ -232,10 +235,14 @@
 
 
             // Sounds
+            // music
+            music = this.sound.add('music')
+            music.play();
                 // bomb
                 bombSound = this.sound.add('bombSound');
-            
+
         };
+
         function update(){
             //Controll player1
             if (q.isDown){
@@ -338,7 +345,7 @@
             player.lifeText.setText('vie: ' + player.state);   
             explose(player);
             bomb.anims.play("explosion");
-            bombSound.volume = 0.2;
+            bombSound.volume = 0.5;
             bombSound.play();
             setTimeout(()=>bomb.destroy(),50);
             die(player);
