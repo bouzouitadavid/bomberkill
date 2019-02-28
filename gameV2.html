@@ -103,7 +103,7 @@
                         };
                     };   
                     //Generate earth platforms
-                    createEarth(platforms,100,-2560,300,60,0,'ground');
+                    createEarth(platforms,100,-2500,300,60,0,'ground');
                     // createEarth(platforms,8,900,1100,60,0,'ground');
                     // createEarth(platforms,9,1640,1100,60,0,'ground');
                     // createEarth(platforms,5,600,800,60,0,'ground');
@@ -225,6 +225,7 @@
             this.physics.add.collider(player2, lava, burn);
             this.physics.add.collider(potions, platforms);
             this.physics.add.overlap(player1, potions, collectpotion, null, this); 
+            this.physics.add.overlap(player2, potions, collectpotion, null, this); 
         };
         function update(){
             //Controll player1
@@ -335,7 +336,7 @@
             //function punching 
             function punching (victime, sens){
                 if (sens == 1){
-                    punchForce = (depunchForce)
+                    
                 } else if (sens == 2){ 
                     punchForce = (-punchForce)
                 }
@@ -346,11 +347,11 @@
                     setTimeout(() => {victime.setAccelerationX(0)}, 500)
             };
             if(e.isDown && d.isDown){
-                punching(player2, 1)
+                punching(player2, 2)
             } else if(e.isDown && q.isDown){
                 punching(player2, 2)
             } if(cursors.right.isDown && m.isDown){
-                punching(player1, 1)
+                punching(player1, 2)
             } else if(cursors.left.isDown && m.isDown){
                 punching(player1, 2)
             };
