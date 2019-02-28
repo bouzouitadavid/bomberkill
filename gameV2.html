@@ -103,7 +103,7 @@
                         };
                     };   
                     //Generate earth platforms
-                    createEarth(platforms,9,-240,300,60,0,'ground');
+                    createEarth(platforms,100,-2560,300,60,0,'ground');
                     // createEarth(platforms,8,900,1100,60,0,'ground');
                     // createEarth(platforms,9,1640,1100,60,0,'ground');
                     // createEarth(platforms,5,600,800,60,0,'ground');
@@ -334,8 +334,11 @@
         function punch (player1, player2){
             //function punching 
             function punching (victime, sens){
-                if (sens == 1){}
-                else if (sens == 2){ punchForce = (-punchForce);}
+                if (sens == 1){
+                    punchForce = (depunchForce)
+                } else if (sens == 2){ 
+                    punchForce = (-punchForce)
+                }
                 victime.setAccelerationX(punchForce)
                     //Créer un variation au cours du temps de l'acceleration
                     setTimeout(() => {victime.setAccelerationX(punchForce/2)},       250)
@@ -343,13 +346,13 @@
                     setTimeout(() => {victime.setAccelerationX(0)}, 500)
             };
             if(e.isDown && d.isDown){
-                punching(player1, 1)
-            } else if(e.isDown && q.isDown){
-                punching(player1, 2)
-            } if(cursors.right.isDown && m.isDown){
                 punching(player2, 1)
-            } else if(cursors.left.isDown && m.isDown){
+            } else if(e.isDown && q.isDown){
                 punching(player2, 2)
+            } if(cursors.right.isDown && m.isDown){
+                punching(player1, 1)
+            } else if(cursors.left.isDown && m.isDown){
+                punching(player1, 2)
             };
         };
         function burn (player, lava){
