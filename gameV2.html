@@ -336,6 +336,7 @@
             player.lifeText.setText('vie: ' + player.state);   
             explose(player);
             bomb.anims.play("explosion");
+            bombSound.volume = 0.2;
             bombSound.play();
             setTimeout(()=>bomb.destroy(),50);
             die(player);
