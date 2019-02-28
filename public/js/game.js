@@ -88,7 +88,9 @@ function preload() {
 }
 
 function addPlayer(self, playerInfo) {
+
   self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude');
+
   // congif player/ship
   self.physics.add.collider(self.ship, self.bomb);
   self.ship.isDead = "false";
@@ -99,20 +101,60 @@ function addPlayer(self, playerInfo) {
   self.ship.setBounce(0.1);
   self.ship.setCollideWorldBounds(false);
   self.physics.add.collider(self.ship, platforms);
+  self.physics.add.collider(self.ship, self.otherPlayer);
+  self.physics.add.collider(self.otherPlayer, self.bomb, explode);
+  self.physics.add.collider(self.ship, self.bomb, explode);
   //Camera for player 1
   camera1 = self.cameras.main.startFollow(self.ship);
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
-  otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
-  self.physics.add.collider(otherPlayer, self);
-  self.physics.add.collider(otherPlayer, platforms);
-  self.physics.add.collider(otherPlayer, self.bombs);
-  
-  
-  
+
+  self.otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  if (playerInfo.team === 'blue') {
+    self.otherPlayer.setTint(0x0000ff);
+  } else {
+    self.otherPlayer.setTint(0xff0000);
+  }
+  self.otherPlayer.playerId = playerInfo.playerId;
+  self.otherPlayers.add(self.otherPlayer);
+  //self.physics.add.collider(otherPlayer, self);
+  self.physics.add.collider(self.otherPlayer, platforms);
+  self.physics.add.collider(self.otherPlayer, self.bombs);
+  self.physics.add.collider(self.otherPlayer, self.ship);
+  self.physics.add.collider(self.otherPlayer, this.bomb, explode);
+}
+
+function explode (bomb, player){
+  console.log("coco")
+  function explose ( victime ){
+      let xForce = bombForceX*((victime.x - bomb.x));
+      let yForce = bombForceY*((victime.y - bomb.y)); 
+      victime.setAccelerationX(xForce);
+      victime.setAccelerationY(yForce);
+          //Créer un variation au cours du temps de l'acceleration
+          setTimeout(() => {
+              victime.setAccelerationY(0)
+          }, 40)
+          setTimeout(() => {
+              victime.setAccelerationX(xForce/2)
+          }, 250)
+          setTimeout(() => {
+              victime.setAccelerationX(xForce/3)
+          }, 450)
+          setTimeout(() => {
+              victime.setAccelerationX(0)
+          }, 500)
+  }
+  player.state -=1;
+  //player.lifeText.setText('vie: ' + player.state);   
+  explose(player);
+  //bomb.anims.play("explosion");
+  // bombSound.volume = 0.2;
+  // bombSound.play();
+  setTimeout(()=>bomb.destroy(),50);
+  // die(player);
+
 }
 function create() {
               //Background (sky width = 5120 heigth = 2880)=>(from -2560 to 2560 and from -1440 to 1440)
@@ -243,14 +285,15 @@ function update() {
                 bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
                 bomb.allowGravity = false;
                 this.physics.add.collider(bomb, platforms);
-                /* setTimeout(() => bomb.anims.play("explosion"), 4000);
-                setTimeout(() => bomb.destroy(), 4020); */
+                this.physics.add.collider(bomb, ship, explode);
+                //setTimeout(() => bomb.anims.play("explosion"), 4000);
+                setTimeout(() => bomb.destroy(), 4020);
                     // emit player movement
                     this.socket.emit('bombMovement', { bombX: bomb.x, bombY: bomb.y});
           }
 
 
-            
+            console.log(this.ship)
            //Controll player1
            if (this.cursors.left.isDown){
             this.ship.setVelocityX(-veloX/malusX);
@@ -285,14 +328,13 @@ function update() {
     var x = this.ship.x;
     var y = this.ship.y;
     var r = this.ship.rotation;
-    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
+    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y)) {
+      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y});
     }
     // save old position data
     this.ship.oldPosition = {
       x: this.ship.x,
       y: this.ship.y,
-      rotation: this.ship.rotation
     };// end emit players
 
   }
