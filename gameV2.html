@@ -87,8 +87,8 @@
         };
         //Element creating
         function create (){
-            //Background
-            this.add.image(0, 770, 'sky');
+            //Background (sky width = 5120 heigth = 2880)=>(from -2560 to 2560 and from -1440 to 1440)
+            this.add.image(0, 0, 'sky');
             //Platforms
                 //classic platforms
                 platforms = this.physics.add.staticGroup();
@@ -103,39 +103,39 @@
                         };
                     };   
                     //Generate earth platforms
-                    createEarth(platforms,9,60,1100,60,0,'ground');
-                    createEarth(platforms,8,900,1100,60,0,'ground');
-                    createEarth(platforms,9,1640,1100,60,0,'ground');
-                    createEarth(platforms,5,600,800,60,0,'ground');
-                    createEarth(platforms,5,1440,800,60,0,'ground');
-                    createEarth(platforms,5,1000,600,60,0,'ground');
-                    createEarth(platforms,5,250,500,60,0,'ground');
-                    createEarth(platforms,5,1800,500,60,0,'ground');
-                    createEarth(platforms,5,300,1350,60,0,'sollave');
-                    createEarth(platforms,5,700,1350,60,0,'sollave');
-                    createEarth(platforms,5,1100,1350,60,0,'sollave');
-                    createEarth(platforms,1,-110,1350,60,0,'sollave');   
-                    createEarth(platforms,1,-50,1600,60,0,'sollave');
-                    createEarth(platforms,1,-180,1900,60,0,'sollave');
-                    createEarth(platforms,1,70,1900,60,0,'sollave');
-                    createEarth(platforms,1,-110,2100,60,0,'sollave');
-                    createEarth(platforms,6,1600,1500,60,0,'sollave');
-                    //Lava box right
-                    createEarth(lava,9,800,1650,60,0,'lavemid');
-                    createEarth(platforms,9,800,1700,60,0,'sollave');
-                    createEarth(platforms,1,1344,1638,0,60,'sollave');
-                    createEarth(platforms,1,1344,17000,0,6,'solnoir');
-                    createEarth(platforms,1,799,1638,0,60,'sollave');
-                    createEarth(platforms,1,799,1700,0,60,'solnoir');
-                    //Lava box left
-                    createEarth(lava,9,100,1650,60,0,'lavemid');
-                    createEarth(platforms,9,100,1700,60,0,'sollave');
-                    createEarth(platforms,1,599,1638,0,60,'sollave');
-                    createEarth(platforms,1,599,1700,0,60,'solnoir');
-                    createEarth(platforms,1,99,1638,0,60,'sollave');
-                    createEarth(platforms,1,99,1700,0,60,'solnoir');
+                    createEarth(platforms,9,-240,300,60,0,'ground');
+                    // createEarth(platforms,8,900,1100,60,0,'ground');
+                    // createEarth(platforms,9,1640,1100,60,0,'ground');
+                    // createEarth(platforms,5,600,800,60,0,'ground');
+                    // createEarth(platforms,5,1440,800,60,0,'ground');
+                    // createEarth(platforms,5,1000,600,60,0,'ground');
+                    // createEarth(platforms,5,250,500,60,0,'ground');
+                    // createEarth(platforms,5,1800,500,60,0,'ground');
+                    // createEarth(platforms,5,300,1350,60,0,'sollave');
+                    // createEarth(platforms,5,700,1350,60,0,'sollave');
+                    // createEarth(platforms,5,1100,1350,60,0,'sollave');
+                    // createEarth(platforms,1,-110,1350,60,0,'sollave');   
+                    // createEarth(platforms,1,-50,1600,60,0,'sollave');
+                    // createEarth(platforms,1,-180,1900,60,0,'sollave');
+                    // createEarth(platforms,1,70,1900,60,0,'sollave');
+                    // createEarth(platforms,1,-110,2100,60,0,'sollave');
+                    // createEarth(platforms,6,1600,1500,60,0,'sollave');
+                    // //Lava box right
+                    // createEarth(lava,9,800,1650,60,0,'lavemid');
+                    // createEarth(platforms,9,800,1700,60,0,'sollave');
+                    // createEarth(platforms,1,1344,1638,0,60,'sollave');
+                    // createEarth(platforms,1,1344,17000,0,6,'solnoir');
+                    // createEarth(platforms,1,799,1638,0,60,'sollave');
+                    // createEarth(platforms,1,799,1700,0,60,'solnoir');
+                    // //Lava box left
+                    // createEarth(lava,9,100,1650,60,0,'lavemid');
+                    // createEarth(platforms,9,100,1700,60,0,'sollave');
+                    // createEarth(platforms,1,599,1638,0,60,'sollave');
+                    // createEarth(platforms,1,599,1700,0,60,'solnoir');
+                    // createEarth(platforms,1,99,1638,0,60,'sollave');
+                    // createEarth(platforms,1,99,1700,0,60,'solnoir');
             //Player 1 creation
-            player1 = this.physics.add.sprite(100, 600, 'dude');
+            player1 = this.physics.add.sprite(-100, 0, 'dude');
             player1.isDead = "false";
             player1.name = "player1";
             player1.state = 5;
@@ -144,19 +144,19 @@
                 //Camera for player 1
                 camera1 = this.cameras.main.startFollow(player1);
                 //Screen life for player 1 
-                player1.lifeText = this.add.text(player1.x-100, player1.y, 'vie: 5', { fontSize: '32px', fill: 'red' })
-                player1.dieText = this.add.text(-50,-100,'GAME OVER!', { fontSize: '50px', fill: 'red'});
+                player1.lifeText = this.add.text(-156, 0, 'vie: 5', { fontSize: '32px', fill: 'red' })
+                player1.dieText = this.add.text(-150,-200,'GAME OVER!', { fontSize: '50px', fill: 'red'});
                 player1.dieText.visible = false;
             //Player 2 creation
-            player2 = this.physics.add.sprite(200, 600, 'dude');
+            player2 = this.physics.add.sprite(100, 0, 'dude');
             player2.isDead = "false";
             player2.name = "player2";
             player2.state = 5;
             player2.setBounce(0.1);
             player2.setCollideWorldBounds(false);
                 //Screen life for player 2 
-                player2.lifeText = this.add.text(player2.x+100, player2.y, 'vie: 5', { fontSize: '32px', fill: 'red' })
-                player2.dieText = this.add.text(-50,-100,'GAME OVER!', { fontSize: '50px', fill: 'red'});
+                player2.lifeText = this.add.text(42, player2.y, 'vie: 5', { fontSize: '32px', fill: 'red' })
+                player2.dieText = this.add.text(-150,-200,'GAME OVER!', { fontSize: '50px', fill: 'red'});
                 player2.dieText.visible = false;
             //Players Animation (general)
             for (let i = 0; i < 6; i++) {
@@ -208,7 +208,7 @@
             potions = this.physics.add.group({
                 key: 'potion',
                 //repeat: 11,
-                setXY: { x: Phaser.Math.RND.between(100, 2000),}
+                setXY: { x: Phaser.Math.RND.between(-2560, 2560),}
             });
             potions.children.iterate(function (child) {
                 child.setBounceY(Phaser.Math.FloatBetween(0.15, 0.35));
@@ -281,8 +281,18 @@
             {
                 player2.setVelocityY(veloY/malusY);
             };
+            //fire a bomb
             if(pointer.justDown){
                 fire();
+            }
+            //rest in peace
+            if(player1.y>=1440){
+                player1.state = -1;
+                die(player1);
+            }
+            if(player2.y>=1440){
+                player2.state = -1;
+                die(player2);
             }
         };
         function fire(){
@@ -291,7 +301,8 @@
             bomb.setCollideWorldBounds(false);
             bomb.setVelocity(-(camera1._width/2-pointer.downX)*1.5,-(camera1._height/2-pointer.downY)*1.5);
             bomb.allowGravity = false;
-            setTimeout(() => {bomb.destroy()}, 3000);
+            setTimeout(() => bomb.anims.play("explosion"), 4000);
+            setTimeout(() => bomb.destroy(), 4020);
         }
         function explode (player, bomb){
             function explose ( victime ){
@@ -364,16 +375,16 @@
             if (potions.countActive(true) === 0){
                 //  A new batch of potions to collect
                 potions.children.iterate(function (child) {
-                    child.enableBody(true, Phaser.Math.RND.between(100, 2000), 0, true, true);
+                    child.enableBody(true, Phaser.Math.RND.between(-2560, 2560), 0, true, true);
                 });
             };
         };
         function die(player){
             if(player.state<0){
+                player.x = 0;
+                player.y = 0;
                 player.dieText.visible=true;
                 player.body.enable = false;
-                player.x = 100;
-                player.y = 100;
                 player.anims.play("die");
                 setTimeout(()=>player.body.enable = true,5000);
                 setTimeout(()=>player.dieText.visible=false,5000);
