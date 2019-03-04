@@ -168,9 +168,9 @@ function create() {
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId == self.socket.id) {
-        addPlayer(this, players[id]);
+        addPlayer(self, players[id]);
       } else {
-        addOtherPlayers(this, players[id]);
+        addOtherPlayers(self, players[id]);
       }
     });
   });
@@ -197,10 +197,10 @@ function create() {
 
 
 function addPlayer(self, playerInfo) {
-  self.player = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  self.player = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
   // congif player/player
   self.player.isDead = "false";
-  self.player.name = player.id;
+  self.player.name = "player";
   self.player.state = 5;
   self.player.setBounce(0.1);
   self.player.setCollideWorldBounds(false);
