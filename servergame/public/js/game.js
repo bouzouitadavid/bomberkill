@@ -44,10 +44,11 @@ let bombForceX = 2000 * 2;
 let bombForceY = 500 * 2;
 //Lava force
 let lavaForce = -1600;
-//Players
+
 //Player1
 let player1;
-let camera1;
+let mainPlayerExist = false;
+let camera;
 //player2
 let player2;
 let game = new Phaser.Game(config);
@@ -85,8 +86,9 @@ function preload() {
   this.load.image('cross', 'assets/cross1.png');
   this.load.image('explosion', 'assets/explosion.png');
 };
-
-//Element creating
+////////////////////
+//Element creating//
+////////////////////
 function create() {
   //Background (sky width = 5120 heigth = 2880)=>(from -2560 to 2560 and from -1440 to 1440)
   this.add.image(0, 0, 'sky');
@@ -129,17 +131,13 @@ function create() {
   createEarth(platforms, 2, -564, 640, 0, 60, 'solnoir');
   createEarth(platforms, 1, 0, 576, 0, 60, 'sollave');
   createEarth(platforms, 2, 0, 640, 0, 60, 'solnoir');
-
   //ESCALIER BAS GAUCHE
   createEarth(platforms, 6, -564, 550, -60, 40, 'sollave');
   createEarth(platforms, 7, -850, 750, -60, 0, 'sollave');
   createEarth(platforms, 4, -1250, 500, -60, 0, 'sollave');
-
   // PLATEFORME MAISON + MAISON
-
   createEarth(platforms, 15, -400, -400, 60, 0, 'ground'); // PLATEFORME MAISON
-
-  //    //DECO                    
+  //DECO                    
   createEarth(decor, 3, -170, 145, 190, 0, 'arbre', 1);
   createEarth(decor, 1, 700, 210, 0, 0, 'arbre');
   createEarth(decor, 1, 905, 175, 0, 0, 'plantpie', 1.5);
@@ -158,10 +156,43 @@ function create() {
   createEarth(decor, 3, 260, -65, 110, 0, 'plantejaune', 0.75);
   createEarth(decor, 3, -450, -90, 60, 0, 'herbe', 1);
   createEarth(decor, 2, -150, -620, 350, 0, 'volcan', 3.0);
-//fin de la création de la map
+  ///////////////////////
+  //création des touches 
+  cursors = this.input.keyboard.createCursorKeys();
+  z = this.input.keyboard.addKey("z");
+  q = this.input.keyboard.addKey("q");
+  d = this.input.keyboard.addKey("d");
+  e = this.input.keyboard.addKey("e");
+  m = this.input.keyboard.addKey("m");
 
-///////////////////////////////
-//Communication avec le serveur
+  //////////////////////////////
+  //Création des anims 
+  for (let i = 0; i < 6; i++) {
+    this.anims.create({
+      key: `left${i}`,
+      frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+  };
+  for (let i = 0; i < 6; i++) {
+    this.anims.create({
+      key: `turn${i}`,
+      frames: [{ key: `sticky-run${i}`, frame: 4 }],
+      frameRate: 20
+    });
+  };
+  for (let i = 0; i < 6; i++) {
+    this.anims.create({
+      key: `right${i}`,
+      frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 5, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+    });
+  };
+
+  ///////////////////////////////
+  //Communication avec le serveur
   let self = this;
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
@@ -197,14 +228,16 @@ function create() {
 
 
 function addPlayer(self, playerInfo) {
-  self.player = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
   // congif player/player
-  self.player.isDead = "false";
-  self.player.name = "player";
-  self.player.state = 5;
-  self.player.setBounce(0.1);
-  self.player.setCollideWorldBounds(false);
-  self.physics.add.collider(self.player, platforms);
+  player1.isDead = "false";
+  player1.state = 5;
+  player1.setBounce(0.1);
+  player1.setCollideWorldBounds(false);
+  self.physics.add.collider(player1, platforms);
+  camera = self.cameras.main.startFollow(player1);
+  //
+  mainPlayerExist = true;
 }
 
 function addOtherPlayers(self, playerInfo) {
@@ -215,57 +248,46 @@ function addOtherPlayers(self, playerInfo) {
 }
 
 function update() {
-  if (this.player) {
-    //Controll player2
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-veloX / malusX);
+  //Controll player2
+  if (mainPlayerExist) {
+    if (cursors.left.isDown) {
+      player1.setVelocityX(-veloX / malusX);
       for (let i = 0; i < 6; i++) {
-        if (this.player.state == i) {
-          //this.player..anims.play(`left${i}`, true);
+        if (player1.state == i) {
+          player1.anims.play(`left${i}`, true);
         };
       };
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(veloX / malusX);
+    } else if (cursors.right.isDown) {
+      player1.setVelocityX(veloX / malusX);
       for (let i = 0; i < 6; i++) {
-        if (this.player.state == i) {
-          //this.player..anims.play(`right${i}`, true);
+        if (player1.state == i) {
+          player1.anims.play(`right${i}`, true);
         };
       };
     } else {
-      this.player.setVelocityX(0);
+      player1.setVelocityX(0);
       for (let i = 0; i < 6; i++) {
-        if (this.player.state == i) {
-          //this.player..anims.play(`turn${i}`);
+        if (player1.state == i) {
+          player1.anims.play(`turn${i}`);
         };
       };
     };
-    if (this.cursors.up.isDown && this.player.body.touching.down) {
-      this.player.setVelocityY(veloY / malusY);
-    };
-
-    // emit player movement
-    var x = this.player.x;
-    var y = this.player.y;
-    if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y )) {
-      this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y });
-    }
-    // save old position data
-    this.player.oldPosition = {
-      x: this.player.x,
-      y: this.player.y,
+    if (cursors.up.isDown && player1.body.touching.down) {
+      player1.setVelocityY(veloY / malusY);
     };
   }
-  //Define collision
 
-  // this.physics.add.collider(player2, platforms);
-  // this.physics.add.collider(player1, player2, punch);
-  // this.physics.add.collider(bombs, platforms);
-  // this.physics.add.collider(bombs, bombs);
-  // this.physics.add.collider(bombs, player1, explode);
-  // this.physics.add.collider(bombs, player2, explode);
-  // this.physics.add.collider(player1, lava, burn);
-  // this.physics.add.collider(player2, lava, burn);
-  // this.physics.add.collider(potions, platforms);
-  // this.physics.add.overlap(player1, potions, collectpotion, null, this); 
-  // this.physics.add.overlap(player2, potions, collectpotion, null, this); 
-} // end update 
+  /*
+  // emit player movement
+  var x = player1.x;
+  var y = player1.y;
+  if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
+    self.socket.emit('playerMovement', { x: player1.x, y: player1.y });
+  }
+  // save old position data
+  player1.oldPosition = {
+    x: player1.x,
+    y: player1.y,
+  };
+  */
+} 
