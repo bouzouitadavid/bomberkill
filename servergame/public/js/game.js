@@ -49,6 +49,7 @@ let lavaForce = -1600;
 let player1;
 let mainPlayerExist = false;
 let camera;
+let clientID;
 //player2
 let player2;
 let game = new Phaser.Game(config);
@@ -197,8 +198,9 @@ function create() {
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
+    clientID = self.socket.id;
     Object.keys(players).forEach(function (id) {
-      if (players[id].playerId == self.socket.id) {
+      if (players[id].playerId == clientID) {
         addPlayer(self, players[id]);
       } else {
         addOtherPlayers(self, players[id]);
@@ -222,10 +224,14 @@ function create() {
       }
     });
   });
-  //Sert à quoi ? 
-  this.cursors = this.input.keyboard.createCursorKeys();
+  this.socket.on('playerMoved', playerInfo => {
+    self.otherPlayers.getChildren().forEach(otherPlayer => {
+      if (playerInfo.playerId === otherPlayer.playerId) {
+        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+      }
+    });
+  });
 }
-
 
 function addPlayer(self, playerInfo) {
   player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
@@ -245,7 +251,9 @@ function addOtherPlayers(self, playerInfo) {
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
   self.physics.add.collider(otherPlayer, platforms);
+  self.physics.add.collider(otherPlayer, player1);
 }
+
 
 function update() {
   //Controll player2
@@ -277,17 +285,19 @@ function update() {
     };
   }
 
-  /*
   // emit player movement
-  var x = player1.x;
-  var y = player1.y;
-  if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
-    self.socket.emit('playerMovement', { x: player1.x, y: player1.y });
+  if (mainPlayerExist) {
+
+    const x = player1.x;
+    const y = player1.y;
+    if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
+      this.socket.emit('player1Movement', { x: player1.x, y: player1.y });
+    }
+
+    // save old position data
+    player1.oldPosition = {
+      x: player1.x,
+      y: player1.y
+    };
   }
-  // save old position data
-  player1.oldPosition = {
-    x: player1.x,
-    y: player1.y,
-  };
-  */
 } 
