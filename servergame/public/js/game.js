@@ -199,6 +199,7 @@ function create() {
   this.otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
     clientID = self.socket.id;
+    console.log("id = " + clientID)
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId == clientID) {
         addPlayer(self, players[id]);
@@ -287,13 +288,11 @@ function update() {
 
   // emit player movement
   if (mainPlayerExist) {
-
-    const x = player1.x;
-    const y = player1.y;
+    let x = player1.x;
+    let y = player1.y;
     if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
-      this.socket.emit('player1Movement', { x: player1.x, y: player1.y });
+      this.socket.emit('playerMovement', { x: player1.x, y: player1.y, id: clientID});
     }
-
     // save old position data
     player1.oldPosition = {
       x: player1.x,

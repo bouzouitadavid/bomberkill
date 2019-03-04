@@ -34,9 +34,10 @@ io.on('connection', function (socket) {
   });
 
   // when a player moves, update the player data
-  socket.on('playerMovement', function (Data) {
-    players[socket.id].x = Data.x;
-    players[socket.id].y = Data.y;
+  socket.on('playerMovement', function (data) {
+    //console.log("a player is moving");
+    players[data.id].x = data.x;
+    players[data.id].y = data.y;
     // emit a message to all players about the player that moved
     socket.broadcast.emit('playerMoved', players[socket.id]);
   });
