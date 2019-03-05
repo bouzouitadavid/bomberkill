@@ -9,18 +9,14 @@ Multiplayer game sticky man with bomb lancer and punch for propulse or explode o
 - [X] Node.js and Javascript
 - [X] Complete game with a sound, effect, ...
 
-#### Ur Choice ?
-Make by Phaser 3
-
 #### Next Level
 - [ ] Lobby with button play and invite friends
 - [ ] Api Facebook
 
 #### Technos Usings
-Phaser3, Javascript, Node, express
+Phaser3, Javascript, Node, Express, Heroku
 
 ### Usage
-
 ```
 git clone https://github.com/bouzouitadavid/bomberkill/
 cd bomberkill
@@ -28,7 +24,7 @@ node server.js
 ```
 Go to your favorite navigator => localhost:8081
 ```
-ifcongif
+ifcongig // in mac and linux for know Ip adress
 ```
 Invite your friends and play the game in localgame ;)
 
