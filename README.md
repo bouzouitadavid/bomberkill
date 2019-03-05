@@ -29,12 +29,12 @@ ifcongig // in mac and linux for know Ip adress
 Invite your friends and play the game in localgame ;)
 
 ### Team
-- [Maxime]() 
-- [Mat]() 
-- [Adrien]() 
-- [Gary]() 
-- [Nathan]()
-- [And me]()
+- [Maxime](https://github.com/Maxime-Christiaens) 
+- [Mathieu](https://github.com/Twoarms) 
+- [Adrien](https://github.com/adriendesart) 
+- [Gary](https://github.com/GaryPetrovski) 
+- [Nathan](https://github.com/nathanhennaux)
+- [And me](#)
 
 ### Thank'you
 All others team for this challenge.
