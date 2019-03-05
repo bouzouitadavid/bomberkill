@@ -1,4 +1,6 @@
-"scripts": {
-  "postinstall": "cd servergame && npm install"
+{
+  "scripts": {
+    "postinstall": "cd servergame && npm install"
+  }
 }
 
