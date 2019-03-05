@@ -49,10 +49,15 @@ io.on('connection', function (socket) {
   });
 });
 
-// server.listen(8081, function () {
-//   console.log(`Listening on ${server.address().port}`);
-// });
+server.listen(8081, function () {
+  console.log(`Listening on ${server.address().port}`);
+});
 
 http.listen(5000, function(){
   console.log('listening on *:5000');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Our app is running on port ${ PORT }`);
 });
