@@ -3,6 +3,7 @@
 Make a game pending GameJame of four days.
 Multiplayer game sticky man with bomb lancer and punch for propulse or explode other player outside the map.
 
+### Project
 #### Insctructions
 - [X] Multiplayer game
 - [X] Node.js and Javascript
@@ -11,21 +12,34 @@ Multiplayer game sticky man with bomb lancer and punch for propulse or explode o
 #### Ur Choice ?
 Make by Phaser 3
 
-### Next Level
+#### Next Level
 - [ ] Lobby with button play and invite friends
 - [ ] Api Facebook
 
 #### Technos Usings
 Phaser3, Javascript, Node, express
 
-#### Team
-- [Maxime]() => Front-End
-- [Mat]() => Back-End
-- [Adrien]() => Front-End
-- [Gary]() => Front-End
-- [Nathan]() => Front-End
-- [And me]() => Full-Stack
+### Usage
 
-#### Thank'you
+```
+git clone https://github.com/bouzouitadavid/bomberkill/
+cd bomberkill
+node server.js
+```
+Go to your favorite navigator => localhost:8081
+```
+ifcongif
+```
+Invite your friends and play the game in localgame ;)
+
+### Team
+- [Maxime]() 
+- [Mat]() 
+- [Adrien]() 
+- [Gary]() 
+- [Nathan]()
+- [And me]()
+
+### Thank'you
 All others team for this challenge.
 And team for this cool game. 
