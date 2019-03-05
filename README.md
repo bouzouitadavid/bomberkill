@@ -3,24 +3,24 @@
 Make a game pending GameJame of four days.
 Multiplayer game sticky man with bomb lancer and punch for propulse or explode other player outside the map.
 
-### Project
-#### Insctructions
+## Project
+### Insctructions
 - [X] Multiplayer game
 - [X] Node.js and Javascript
 - [X] Complete game with a sound, effect, ...
 
-#### Next Level
+### Next Level
 - [ ] Lobby with button play and invite friends
 - [ ] Api Facebook
 
-#### Technos Usings
+### Technos Usings
 Phaser3, Javascript, Node, Express, Heroku
 
-### Usage
-#### Online
+## Usage
+### Online
 [Sticky Bomber](https://stickybomber.herokuapp.com/)
 
-#### Local
+### Local
 ```
 git clone https://github.com/bouzouitadavid/bomberkill/
 cd bomberkill
@@ -44,7 +44,7 @@ Invite your friends and play the game in localgame ;)
 - https://www.youtube.com/watch?v=VufDd-QL1c0
 
 
-### Team
+## Team
 - [Maxime](https://github.com/Maxime-Christiaens) 
 - [Mathieu](https://github.com/Twoarms) 
 - [Adrien](https://github.com/adriendesart) 
@@ -52,6 +52,6 @@ Invite your friends and play the game in localgame ;)
 - [Nathan](https://github.com/nathanhennaux)
 - [And me](#)
 
-### Thank'you
+## Thank'you
 All others team for this challenge.
 And team for this cool game. 
