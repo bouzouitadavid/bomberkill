@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node servergame/server.js"
   },
   "author": "Scott Westover",
   "license": "ISC",
