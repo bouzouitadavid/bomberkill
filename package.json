@@ -4,7 +4,8 @@
   "description": "game .js",
   "main": "server.js",
   "scripts": {
-    "start": "node servergame/server.js"
+    "start": "node server.js",
+      "postinstall": "cd client && npm install"
   },
   "author": "Scott Westover",
   "license": "ISC",
