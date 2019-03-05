@@ -1,7 +1,7 @@
 {
   "name": "phaser_tut2",
   "version": "1.0.0",
-  "description": "",
+  "description": "game .js",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,5 +11,18 @@
   "dependencies": {
     "express": "^4.16.3",
     "socket.io": "^2.1.0"
-  }
+  },
+  "directories": {
+    "example": "example"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bouzouitadavid/bomberkill.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/bouzouitadavid/bomberkill/issues"
+  },
+  "homepage": "https://github.com/bouzouitadavid/bomberkill#readme"
 }
