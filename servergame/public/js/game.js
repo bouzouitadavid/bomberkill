@@ -47,11 +47,13 @@ let lavaForce = -1600;
 
 //Player1
 let player1;
+//stockera tout les autres joueurs
+let otherPlayers = [];
 let mainPlayerExist = false;
+let otherPlayerExist = false;
 let camera;
 let clientID;
-//player2
-let player2;
+let input;
 let game = new Phaser.Game(config);
 
 
@@ -196,7 +198,7 @@ function create() {
   //Communication avec le serveur
   let self = this;
   this.socket = io();
-  this.otherPlayers = this.physics.add.group();
+  otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
     clientID = self.socket.id;
     console.log("id = " + clientID)
@@ -212,86 +214,127 @@ function create() {
     addOtherPlayers(self, playerInfo);
   });
   this.socket.on('disconnect', function (playerId) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+    otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
       }
     });
   });
   this.socket.on('playerMoved', function (playerInfo) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+    //fait une boucle sur chaque autres joueurs et incrémente les nouvelles positions transmisses par le serveur
+    otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-      }
-    });
-  });
-  this.socket.on('playerMoved', playerInfo => {
-    self.otherPlayers.getChildren().forEach(otherPlayer => {
-      if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+        otherPlayer.input = playerInfo.input;
+        //pour le test de l'anim
+        otherPlayer.state = 5;
+
       }
     });
   });
 }
 
 function addPlayer(self, playerInfo) {
-  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude')
   // congif player/player
-  player1.isDead = "false";
-  player1.state = 5;
-  player1.setBounce(0.1);
-  player1.setCollideWorldBounds(false);
-  self.physics.add.collider(player1, platforms);
-  camera = self.cameras.main.startFollow(player1);
+  player1.isDead = "false"
+  player1.state = 5
+  player1.setBounce(0.1)
+  player1.setCollideWorldBounds(false)
+  self.physics.add.collider(player1, platforms)
+  camera = self.cameras.main.startFollow(player1)
   //
-  mainPlayerExist = true;
+  mainPlayerExist = true
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
-  otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
-  self.physics.add.collider(otherPlayer, platforms);
-  self.physics.add.collider(otherPlayer, player1);
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude')
+  otherPlayer.playerId = playerInfo.playerId
+  otherPlayers.add(otherPlayer)
+  self.physics.add.collider(otherPlayer, platforms)
+  self.physics.add.collider(otherPlayer, player1)
+  otherPlayerExist = true;
 }
 
-
 function update() {
-  //Controll player2
   if (mainPlayerExist) {
+    /////////////////////
+    //création des input
     if (cursors.left.isDown) {
-      player1.setVelocityX(-veloX / malusX);
-      for (let i = 0; i < 6; i++) {
-        if (player1.state == i) {
-          player1.anims.play(`left${i}`, true);
-        };
-      };
-    } else if (cursors.right.isDown) {
-      player1.setVelocityX(veloX / malusX);
-      for (let i = 0; i < 6; i++) {
-        if (player1.state == i) {
-          player1.anims.play(`right${i}`, true);
-        };
-      };
-    } else {
-      player1.setVelocityX(0);
-      for (let i = 0; i < 6; i++) {
-        if (player1.state == i) {
-          player1.anims.play(`turn${i}`);
-        };
-      };
-    };
+      input = "left"
+    }
+    else if (cursors.right.isDown) {
+      input = "right"
+    }
+    else {
+      input = "center"
+    }
+    //////////////////////////////////////
+    //Animation et movement pour le joueur
+    function animatedAndMove(player, input) {
+      if (input == "left") {
+        player.setVelocityX(-veloX / malusX);
+        for (let i = 0; i < 6; i++) {
+          if (player.state == i) {
+            player.anims.play(`left${i}`, true);
+          }
+        }
+      } else if (input == "right") {
+        player.setVelocityX(veloX / malusX);
+        for (let i = 0; i < 6; i++) {
+          if (player.state == i) {
+            player.anims.play(`right${i}`, true);
+          }
+        }
+      } else {
+        player.setVelocityX(0);
+        for (let i = 0; i < 6; i++) {
+          if (player.state == i) {
+            player.anims.play(`turn${i}`);
+          }
+        }
+      }
+    }
+    //////////////////////////////
+    //Animation des autres joueurs
+    function animatedOther() {
+      otherPlayers.getChildren().forEach(function (otherPlayer) {
+        if (otherPlayer.input == "left") {
+          for (let i = 0; i < 6; i++) {
+            if (otherPlayer.state == i) {
+              otherPlayer.anims.play(`left${i}`, true);
+            }
+          }
+        }
+        else if (otherPlayer.input == "right") {
+          for (let i = 0; i < 6; i++) {
+            if (otherPlayer.state == i) {
+              otherPlayer.anims.play(`right${i}`, true);
+            }
+          }
+        }
+        else {
+          for (let i = 0; i < 6; i++) {
+            if (otherPlayer.state == i) {
+              otherPlayer.anims.play(`turn${i}`, true);
+            }
+          }
+        }
+      });
+    }
+    animatedAndMove(player1, input);
+    if(otherPlayerExist){
+      animatedOther();
+    }
     if (cursors.up.isDown && player1.body.touching.down) {
       player1.setVelocityY(veloY / malusY);
     };
-  }
-
-  // emit player movement
-  if (mainPlayerExist) {
+    ///////////////////////
+    // emit player movement
     let x = player1.x;
     let y = player1.y;
     if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
-      this.socket.emit('playerMovement', { x: player1.x, y: player1.y, id: clientID});
+      this.socket.emit('playerMovement', { x: player1.x, y: player1.y, input: input, id: clientID });
     }
     // save old position data
     player1.oldPosition = {

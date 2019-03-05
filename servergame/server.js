@@ -16,8 +16,12 @@ io.on('connection', function (socket) {
   console.log('a user connected: ', socket.id);
   // create a new player and add it to our players object
   players[socket.id] = {
+    //x et y gère la position dans l'espace 2D des joueurs
     x: 0,
     y: 0,
+    //input gère le déclenchement des animations
+    input: "",
+    //stock l'id
     playerId: socket.id
   };
   // send the players object to the new player
@@ -28,6 +32,7 @@ io.on('connection', function (socket) {
   // when a player disconnects, remove them from our players object
   socket.on('disconnect', function () {
     console.log('user disconnected: ', socket.id);
+    // à la déconnexion supprime le joueur déconnecter
     delete players[socket.id];
     // emit a message to all players to remove this player
     io.emit('disconnect', socket.id);
@@ -35,9 +40,10 @@ io.on('connection', function (socket) {
 
   // when a player moves, update the player data
   socket.on('playerMovement', function (data) {
-    //console.log("a player is moving");
+    //Le serveur récupère tout changement de position et le stock à la bonne personne à l'aide de l'ID
     players[data.id].x = data.x;
     players[data.id].y = data.y;
+    players[data.id].input = data.input;
     // emit a message to all players about the player that moved
     socket.broadcast.emit('playerMoved', players[socket.id]);
   });
