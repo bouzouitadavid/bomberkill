@@ -33,15 +33,15 @@ ifcongig // in mac and linux for know Ip adress
 Invite your friends and play the game in localgame ;)
 
 ### Doc's
-https://docs.google.com/document/d/1DFJTHLcimD3OCxcdOuLPB39RY4m-LymM7nQbAnubCAE/edit#heading=h.xugol6aftu9r
+- https://docs.google.com/document/d/1DFJTHLcimD3OCxcdOuLPB39RY4m-LymM7nQbAnubCAE/edit#heading=h.xugol6aftu9r
 ### Ressources
-https://openclassrooms.com/fr/courses/1211856-comment-creer-un-jeu-video/3048612-trouvez-des-ressources-existantes
-https://www.dynetisgames.com/2017/03/06/how-to-make-a-multiplayer-online-game-with-phaser-socket-io-and-node-js/
-https://opengameart.org/content/2d-platformer-volcano-pack-11
-https://codeburst.io/how-to-make-a-simple-multiplayer-online-car-game-with-javascript-89d47908f995
-https://www.robinwieruch.de/minimal-node-js-babel-setup/
+- https://openclassrooms.com/fr/courses/1211856-comment-creer-un-jeu-video/3048612-trouvez-des-ressources-existantes
+- https://www.dynetisgames.com/2017/03/06/how-to-make-a-multiplayer-online-game-with-phaser-socket-io-and-node-js/
+- https://opengameart.org/content/2d-platformer-volcano-pack-11
+- https://codeburst.io/how-to-make-a-simple-multiplayer-online-car-game-with-javascript-89d47908f995
+- https://www.robinwieruch.de/minimal-node-js-babel-setup/
 ### Inspiration
-https://www.youtube.com/watch?v=VufDd-QL1c0
+- https://www.youtube.com/watch?v=VufDd-QL1c0
 
 
 ### Team
