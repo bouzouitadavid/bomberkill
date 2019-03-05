@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-      "postinstall": "cd client && npm install"
+    "postinstall": "cd servergame && npm install"
   },
   "author": "Scott Westover",
   "license": "ISC",
