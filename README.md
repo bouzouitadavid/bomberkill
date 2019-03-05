@@ -17,6 +17,10 @@ Multiplayer game sticky man with bomb lancer and punch for propulse or explode o
 Phaser3, Javascript, Node, Express, Heroku
 
 ### Usage
+#### Online
+[Sticky Bomber](https://stickybomber.herokuapp.com/)
+
+#### Local
 ```
 git clone https://github.com/bouzouitadavid/bomberkill/
 cd bomberkill
