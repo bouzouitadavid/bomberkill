@@ -2,7 +2,7 @@
   "name": "phaser_tut2",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "servergame/server.js",
   "scripts": {
     "start": "node servergame/server.js"
   },
