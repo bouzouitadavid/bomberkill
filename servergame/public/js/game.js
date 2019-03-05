@@ -320,7 +320,7 @@ function update() {
             }
           }
         }
-      });
+      })
     }
     animatedAndMove(player1, input);
     if(otherPlayerExist){
