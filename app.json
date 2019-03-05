@@ -1,11 +1,4 @@
-{
-  "buildpacks": [
-    {
-      "url": "heroku/nodejs"
-    }
-  ,
-],
 "scripts": {
   "postinstall": "cd servergame && npm install"
 }
-}
+
