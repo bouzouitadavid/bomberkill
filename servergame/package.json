@@ -1,12 +1,10 @@
-
 {
   "name": "phaser_tut2",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node servergame/server.js",
-    "postinstall": "cd servergame && npm install"
+    "start": "node server.js"
   },
   "author": "Scott Westover",
   "license": "ISC",
