@@ -97,36 +97,7 @@ function create() {
     };
     //Generate earth platforms
     createEarth(platforms, 100, -2500, 300, 60, 0, 'ground');
-    // createEarth(platforms,8,900,1100,60,0,'ground');
-    // createEarth(platforms,9,1640,1100,60,0,'ground');
-    // createEarth(platforms,5,600,800,60,0,'ground');
-    // createEarth(platforms,5,1440,800,60,0,'ground');
-    // createEarth(platforms,5,1000,600,60,0,'ground');
-    // createEarth(platforms,5,250,500,60,0,'ground');
-    // createEarth(platforms,5,1800,500,60,0,'ground');
-    // createEarth(platforms,5,300,1350,60,0,'sollave');
-    // createEarth(platforms,5,700,1350,60,0,'sollave');
-    // createEarth(platforms,5,1100,1350,60,0,'sollave');
-    // createEarth(platforms,1,-110,1350,60,0,'sollave');   
-    // createEarth(platforms,1,-50,1600,60,0,'sollave');
-    // createEarth(platforms,1,-180,1900,60,0,'sollave');
-    // createEarth(platforms,1,70,1900,60,0,'sollave');
-    // createEarth(plattforms,1,-110,2100,60,0,'sollave');
-    // createEarth(platforms,6,1600,1500,60,0,'sollave');
-    // //Lava box right
-    // createEarth(lava,9,800,1650,60,0,'lavemid');
-    // createEarth(platforms,9,800,1700,60,0,'sollave');
-    // createEarth(platforms,1,1344,1638,0,60,'sollave');
-    // createEarth(platforms,1,1344,17000,0,6,'solnoir');
-    // createEarth(platforms,1,799,1638,0,60,'sollave');
-    // createEarth(platforms,1,799,1700,0,60,'solnoir');
-    // //Lava box left
-    // createEarth(lava,9,100,1650,60,0,'lavemid');
-    // createEarth(platforms,9,100,1700,60,0,'sollave');
-    // createEarth(platforms,1,599,1638,0,60,'sollave');
-    // createEarth(platforms,1,599,1700,0,60,'solnoir');
-    // createEarth(platforms,1,99,1638,0,60,'sollave');
-    // createEarth(platforms,1,99,1700,0,60,'solnoir');
+
     //Player 1 creation
     player1 = this.physics.add.sprite(-100, 0, 'dude');
     player1.isDead = "false";
@@ -219,8 +190,6 @@ function create() {
     this.physics.add.collider(potions, platforms);
     this.physics.add.overlap(player1, potions, collectpotion, null, this);
     this.physics.add.overlap(player2, potions, collectpotion, null, this);
-
-
     // Sounds
     // bomb
     bombSound = this.sound.add('bombSound');
@@ -322,9 +291,9 @@ function explode(player, bomb) {
             victime.setAccelerationX(0)
         }, 500)
     }
+    explose(player);
     player.state -= 1;
     player.lifeText.setText('vie: ' + player.state);
-    explose(player);
     bomb.anims.play("explosion");
     bombSound.volume = 0.2;
     bombSound.play();
