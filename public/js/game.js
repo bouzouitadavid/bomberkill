@@ -25,34 +25,42 @@ let config = {
   }
 };
 //Global let
-let bombs;
-let potions;
-let platforms;
-let lava;
-let cursors;
-let pointer;
+let bombs
+let bombCount = 0
+let bomb
+let potions
+let platforms
+let lava
+let cursors
+let pointer
 //Physical params
+let bombX
+let bombY
+let bombVeloX
+let bombVeloY
 //Player's Velocity
-let veloX = 200;
-let veloY = -650;
-let malusX = 1;
-let malusY = 1;
+let veloX = 200
+let veloY = -650
+let malusX = 1
+let malusY = 1
 //Punch force
-let punchForce = 30000;
+let punchForce = 30000
 //Bombs force
-let bombForceX = 2000 * 2;
-let bombForceY = 500 * 2;
+let bombForceX = 2000 * 2
+let bombForceY = 500 * 2
 //Lava force
-let lavaForce = -1600;
+let lavaForce = -1600
 
 //Player1
-let player1;
-let mainPlayerExist = false;
-let camera;
-let clientID;
-//player2
-let player2;
-let game = new Phaser.Game(config);
+let player1
+//stockera tout les autres joueurs
+let otherPlayers = []
+let mainPlayerExist = false
+let otherPlayerExist = false
+let camera
+let clientID
+let input
+let game = new Phaser.Game(config)
 
 
 function preload() {
@@ -96,9 +104,12 @@ function create() {
   //Platforms
   //classic platforms                
   platforms = this.physics.add.staticGroup();
+  //decor = plante,arbre,roche 
   decor = this.physics.add.staticGroup();
   //lava platforms
   lava = this.physics.add.staticGroup();
+  //add physics to the bombs
+  bombs = this.physics.add.group();
   //Function to generate platforms
   function createEarth(name, number, coodX, coodY, xSpacing, ySpacing, type, scale = 0.5) {
     for (let i = 0; i < number; i++) {
@@ -159,12 +170,18 @@ function create() {
   createEarth(decor, 2, -150, -620, 350, 0, 'volcan', 3.0);
   ///////////////////////
   //création des touches 
-  cursors = this.input.keyboard.createCursorKeys();
-  z = this.input.keyboard.addKey("z");
-  q = this.input.keyboard.addKey("q");
-  d = this.input.keyboard.addKey("d");
-  e = this.input.keyboard.addKey("e");
-  m = this.input.keyboard.addKey("m");
+  cursors = this.input.keyboard.createCursorKeys()
+  z = this.input.keyboard.addKey("z")
+  q = this.input.keyboard.addKey("q")
+  d = this.input.keyboard.addKey("d")
+  e = this.input.keyboard.addKey("e")
+  m = this.input.keyboard.addKey("m")
+  pointer = this.input.activePointer
+  ////////////////////////
+  //Collision 
+  this.physics.add.collider(bombs, platforms)
+  this.physics.add.collider(bombs, bombs)
+  this.physics.add.collider(bombs, lava)
 
   //////////////////////////////
   //Création des anims 
@@ -174,8 +191,8 @@ function create() {
       frames: this.anims.generateFrameNumbers(`sticky-run${i}`, { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
-    });
-  };
+    })
+  }
   for (let i = 0; i < 6; i++) {
     this.anims.create({
       key: `turn${i}`,
@@ -191,15 +208,20 @@ function create() {
       repeat: -1
     });
   };
+  //anim death 
+  this.anims.create({
+    key: "die",
+    frames: [{ key: "cross" }],
+    frameRate: 20
+  });
 
   ///////////////////////////////
   //Communication avec le serveur
   let self = this;
   this.socket = io();
-  this.otherPlayers = this.physics.add.group();
+  otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
     clientID = self.socket.id;
-    console.log("id = " + clientID)
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId == clientID) {
         addPlayer(self, players[id]);
@@ -212,91 +234,222 @@ function create() {
     addOtherPlayers(self, playerInfo);
   });
   this.socket.on('disconnect', function (playerId) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+    otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
       }
     });
   });
   this.socket.on('playerMoved', function (playerInfo) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+    //fait une boucle sur chaque autres joueurs et incrémente les nouvelles positions transmisses par le serveur
+    otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+        otherPlayer.input = playerInfo.input;
+        //pour le test de l'anim
+        otherPlayer.state = 5; // playerInfo.state
       }
     });
   });
-  this.socket.on('playerMoved', playerInfo => {
-    self.otherPlayers.getChildren().forEach(otherPlayer => {
-      if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-      }
-    });
-  });
+  //récéption des bombs
+  this.socket.on('OtherBombs', function (boom) {
+    console.log("bomb id" + boom.id)
+    bomb = bombs.create(boom.x, boom.y, 'bomb')
+    bomb.setBounce(0.8)
+    bomb.body.velocity.x = boom.vx
+    bomb.body.velocity.y = boom.vy
+    setTimeout(() => bomb.destroy(), 4020)
+  })
 }
 
 function addPlayer(self, playerInfo) {
-  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude');
+  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude')
   // congif player/player
-  player1.isDead = "false";
-  player1.state = 5;
-  player1.setBounce(0.1);
-  player1.setCollideWorldBounds(false);
-  self.physics.add.collider(player1, platforms);
-  camera = self.cameras.main.startFollow(player1);
-  //
-  mainPlayerExist = true;
+  player1.isDead = "false"
+  player1.state = 5
+  player1.setBounce(0.1)
+  player1.setCollideWorldBounds(false)
+  self.physics.add.collider(player1, platforms)
+  camera = self.cameras.main.startFollow(player1)
+  mainPlayerExist = true
+  //créer les collisions avec les bombs
+  self.physics.add.collider(player1, bombs, explode)
+  self.physics.add.collider(player1, lava)
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude');
-  otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
-  self.physics.add.collider(otherPlayer, platforms);
-  self.physics.add.collider(otherPlayer, player1);
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude')
+  otherPlayer.playerId = playerInfo.playerId
+  otherPlayers.add(otherPlayer)
+  self.physics.add.collider(otherPlayers, platforms)
+  self.physics.add.collider(otherPlayers, player1)
+  otherPlayerExist = true;
+}
+///////////////////////
+// Création de bomb
+function fire() {
+  if(player1.state >= 0){
+  bomb = bombs.create(player1.x, player1.y, 'bomb')
+  bomb.setBounce(0.8)
+  //bomb.setCollideWorldBounds(false)
+  bomb.setVelocity(-(camera._width / 2 - pointer.downX) * 1.5, -(camera._height / 2 - pointer.downY) * 1.5)
+  bomb.allowGravity = false
+  bomb.name = clientID + bombCount
+  bomb.id = clientID
+  bomb.number = bombCount
+  bombX = bomb.body.x
+  bombY = bomb.body.y
+  bombVeloX = bomb.body.velocity.x
+  bombVeloY = bomb.body.velocity.y
+  bombCount += 1
+  }
+  //setTimeout(() => bomb.destroy(), 4020);
+  return (bomb, bombX, bombY, bombVeloX, bombVeloY)
+}
+//////////////////////
+//KABOOM
+function explode(player, bomb) {
+  function explose(victime) {
+    let xForce = bombForceX * ((player.x - bomb.x));
+    let yForce = bombForceY * ((player.y - bomb.y));
+    victime.setAccelerationX(xForce);
+    victime.setAccelerationY(yForce);
+    //Créer un variation au cours du temps de l'acceleration
+    setTimeout(() => {
+      victime.setAccelerationY(0)
+    }, 40)
+    setTimeout(() => {
+      victime.setAccelerationX(xForce / 2)
+    }, 250)
+    setTimeout(() => {
+      victime.setAccelerationX(xForce / 3)
+    }, 450)
+    setTimeout(() => {
+      victime.setAccelerationX(0)
+    }, 500)
+  }
+  explose(player)
+  player.state -= 1
+  /*
+  bomb.anims.play("explosion");
+  bombSound.volume = 0.2;
+  bombSound.play();
+  */
+  setTimeout(() => bomb.destroy(), 50);
+  die(player)
+}
+////////////////
+//Die 
+function die(player) {
+  if (player.state < 0) {
+    player.x = 0
+    player.y = 0
+    //player.dieText.visible = true
+    player.body.enable = false
+    player.anims.play("die")
+    /*
+    setTimeout(() => player.body.enable = true, 5000);
+    setTimeout(() => player.dieText.visible = false, 5000);
+    setTimeout(() => player.state = 5, 5000);
+    setTimeout(() => player.lifeText.setText('vie: ' + player.state), 5000);
+    */
+  }
 }
 
-
 function update() {
-  //Controll player2
   if (mainPlayerExist) {
+    /////////////////////
+    //création des input
     if (cursors.left.isDown) {
-      player1.setVelocityX(-veloX / malusX);
-      for (let i = 0; i < 6; i++) {
-        if (player1.state == i) {
-          player1.anims.play(`left${i}`, true);
-        };
-      };
-    } else if (cursors.right.isDown) {
-      player1.setVelocityX(veloX / malusX);
-      for (let i = 0; i < 6; i++) {
-        if (player1.state == i) {
-          player1.anims.play(`right${i}`, true);
-        };
-      };
-    } else {
-      player1.setVelocityX(0);
-      for (let i = 0; i < 6; i++) {
-        if (player1.state == i) {
-          player1.anims.play(`turn${i}`);
-        };
-      };
-    };
+      input = "left"
+    }
+    else if (cursors.right.isDown) {
+      input = "right"
+    }
+    else {
+      input = "center"
+    }
+    //////////////////////////////////////
+    //Animation et movement pour le joueur
+    function animatedAndMove(player, input) {
+      if (input == "left") {
+        player.setVelocityX(-veloX / malusX);
+        for (let i = 0; i < 6; i++) {
+          if (player.state == i) {
+            player.anims.play(`left${i}`, true);
+          }
+        }
+      } else if (input == "right") {
+        player.setVelocityX(veloX / malusX);
+        for (let i = 0; i < 6; i++) {
+          if (player.state == i) {
+            player.anims.play(`right${i}`, true);
+          }
+        }
+      } else {
+        player.setVelocityX(0);
+        for (let i = 0; i < 6; i++) {
+          if (player.state == i) {
+            player.anims.play(`turn${i}`);
+          }
+        }
+      }
+    }
+    //////////////////////////////
+    //Animation des autres joueurs
+    function animatedOther() {
+      otherPlayers.getChildren().forEach(function (otherPlayer) {
+        if (otherPlayer.input == "left") {
+          for (let i = 0; i < 6; i++) {
+            if (otherPlayer.state == i) {
+              otherPlayer.anims.play(`left${i}`, true);
+            }
+          }
+        }
+        else if (otherPlayer.input == "right") {
+          for (let i = 0; i < 6; i++) {
+            if (otherPlayer.state == i) {
+              otherPlayer.anims.play(`right${i}`, true);
+            }
+          }
+        }
+        else {
+          for (let i = 0; i < 6; i++) {
+            if (otherPlayer.state == i) {
+              otherPlayer.anims.play(`turn${i}`, true);
+            }
+          }
+        }
+      })
+    }
+    animatedAndMove(player1, input);
+    if (otherPlayerExist) {
+      animatedOther()
+    }
     if (cursors.up.isDown && player1.body.touching.down) {
       player1.setVelocityY(veloY / malusY);
-    };
-  }
-
-  // emit player movement
-  if (mainPlayerExist) {
-    let x = player1.x;
-    let y = player1.y;
+    }
+    //permet de créer les bombes au click
+    if (pointer.justDown) {
+      fire()
+      this.socket.emit('bombs', { x: bombX, y: bombY, vx: bombVeloX, vy: bombVeloY, name: bomb.name, id: bomb.id })
+    }
+    ///////////////////////
+    // emit player movement
+    let x = player1.x
+    let y = player1.y
     if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
-      this.socket.emit('playerMovement', { x: player1.x, y: player1.y, id: clientID});
+      this.socket.emit('playerMovement', { x: player1.x, y: player1.y, input: input, state: player1.state, id: clientID })
     }
     // save old position data
     player1.oldPosition = {
       x: player1.x,
       y: player1.y
-    };
+    }
+    //dying condition
+    if (player1.y >= 1440) {
+      player1.state = -5
+      die(player1)
+    }
   }
-} 
+}
