@@ -55,7 +55,6 @@ let lavaForce = -1600
 let player1
 //stockera tout les autres joueurs
 let otherPlayers = []
-let mainPlayerExist = false
 let otherPlayerExist = false
 let camera
 let clientID
@@ -179,9 +178,9 @@ function create() {
   pointer = this.input.activePointer
   ////////////////////////
   //Collision 
-  this.physics.add.collider(bombs, platforms)
-  this.physics.add.collider(bombs, bombs)
-  this.physics.add.collider(bombs, lava)
+  this.physics.add.collider(bombs, platforms, destroy)
+  this.physics.add.collider(bombs, bombs, destroy)
+  this.physics.add.collider(bombs, lava, destroy)
 
   //////////////////////////////
   //Création des anims 
@@ -244,10 +243,9 @@ function create() {
     //fait une boucle sur chaque autres joueurs et incrémente les nouvelles positions transmisses par le serveur
     otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-        otherPlayer.input = playerInfo.input;
-        //pour le test de l'anim
-        otherPlayer.state = 5; // playerInfo.state
+        otherPlayer.setPosition(playerInfo.x, playerInfo.y)
+        otherPlayer.input = playerInfo.input
+        otherPlayer.state = playerInfo.state
       }
     });
   });
@@ -258,7 +256,6 @@ function create() {
     bomb.setBounce(0.8)
     bomb.body.velocity.x = boom.vx
     bomb.body.velocity.y = boom.vy
-    setTimeout(() => bomb.destroy(), 4020)
   })
 }
 
@@ -269,12 +266,14 @@ function addPlayer(self, playerInfo) {
   player1.state = 5
   player1.setBounce(0.1)
   player1.setCollideWorldBounds(false)
+  //player1.lifeText = self.add.text(42, player1.y, 'vie: 5', { fontSize: '32px', fill: 'green' })
+  player1.dieText = self.add.text(-150, -200, 'GAME OVER!', { fontSize: '50px', fill: 'red' })
+  player1.dieText.visible = false;
   self.physics.add.collider(player1, platforms)
   camera = self.cameras.main.startFollow(player1)
-  mainPlayerExist = true
   //créer les collisions avec les bombs
   self.physics.add.collider(player1, bombs, explode)
-  self.physics.add.collider(player1, lava)
+  self.physics.add.collider(player1, lava, burn)
 }
 
 function addOtherPlayers(self, playerInfo) {
@@ -283,6 +282,7 @@ function addOtherPlayers(self, playerInfo) {
   otherPlayers.add(otherPlayer)
   self.physics.add.collider(otherPlayers, platforms)
   self.physics.add.collider(otherPlayers, player1)
+  self.physics.add.collider(otherPlayers, lava)
   otherPlayerExist = true;
 }
 ///////////////////////
@@ -344,20 +344,35 @@ function die(player) {
   if (player.state < 0) {
     player.x = 0
     player.y = 0
-    //player.dieText.visible = true
     player.body.enable = false
     player.anims.play("die")
-    /*
+    player.dieText.visible = true
     setTimeout(() => player.body.enable = true, 5000);
-    setTimeout(() => player.dieText.visible = false, 5000);
     setTimeout(() => player.state = 5, 5000);
-    setTimeout(() => player.lifeText.setText('vie: ' + player.state), 5000);
-    */
+    setTimeout(() => player.dieText.visible = false, 5000);
+    //setTimeout(() => player.lifeText.setText('vie: ' + player.state), 5000);
   }
+}
+///////////////
+//Lava
+function burn(player, lava) {
+  player.state -= 1
+  //player.lifeText.setText('vie: ' + player.state);
+  function lavaRepulse(victime) {
+      victime.setAccelerationY(lavaForce)
+      setTimeout(() => { victime.setAccelerationY(lavaForce / 2) }, 250)
+      setTimeout(() => { victime.setAccelerationY(lavaForce / 3) }, 450)
+      setTimeout(() => { victime.setAccelerationY(0) }, 500)
+  }
+  lavaRepulse(player)
+  die(player)
+}
+function destroy(bomb){
+  setTimeout(() => bomb.destroy(), 4020);
 }
 
 function update() {
-  if (mainPlayerExist) {
+  if (player1) {
     /////////////////////
     //création des input
     if (cursors.left.isDown) {
@@ -400,6 +415,7 @@ function update() {
     function animatedOther() {
       otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (otherPlayer.input == "left") {
+          console.log("state = " + otherPlayer.state)
           for (let i = 0; i < 6; i++) {
             if (otherPlayer.state == i) {
               otherPlayer.anims.play(`left${i}`, true);
@@ -438,18 +454,23 @@ function update() {
     // emit player movement
     let x = player1.x
     let y = player1.y
-    if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y)) {
+    let state = player1.state
+    if (player1.oldPosition && (x !== player1.oldPosition.x || y !== player1.oldPosition.y || state !== player1.oldPosition.state)) {
       this.socket.emit('playerMovement', { x: player1.x, y: player1.y, input: input, state: player1.state, id: clientID })
     }
     // save old position data
     player1.oldPosition = {
       x: player1.x,
-      y: player1.y
+      y: player1.y,
+      state: player1.state
     }
     //dying condition
     if (player1.y >= 1440) {
       player1.state = -5
       die(player1)
+    }
+    if (bomb && bomb.y >= 1440){
+      bomb.destroy();
     }
   }
 }
