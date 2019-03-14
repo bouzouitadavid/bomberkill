@@ -11,6 +11,11 @@ let bomb = {
   vx : "",
   vy : ""
 }
+let potion ={
+  x : "",
+  y : ""
+}
+let howManyPotion = 0
 
 app.use(express.static(__dirname + '/public'));
 
@@ -23,8 +28,8 @@ io.on('connection', function (socket) {
   // create a new player and add it to our players object
   players[socket.id] = {
     //x et y gère la position dans l'espace 2D des joueurs
-    x: 0,
-    y: 0,
+    x: Math.floor(Math.random() * Math.floor(2))==0?Math.floor(Math.random() * Math.floor(1000)): -(Math.floor(Math.random() * Math.floor(1400))),
+    y: Math.floor(Math.random() * Math.floor(2))==0?-1400:0,
     state: 5,
     //input gère le déclenchement des animations
     input: "",
@@ -63,6 +68,22 @@ io.on('connection', function (socket) {
     bomb.vx = data.vx
     bomb.vy = data.vy
     socket.broadcast.emit('OtherBombs', bomb)
+  })
+  const createPotion=()=>{
+    if(howManyPotion <1){
+      potion.x = Math.floor(Math.random() * Math.floor(2))==0?Math.floor(Math.random() * Math.floor(1000)): -(Math.floor(Math.random() * Math.floor(1400)))
+      potion.y = Math.floor(Math.random() * Math.floor(2))==0?-1400:0
+      socket.emit('potions', potion)
+      return howManyPotion++
+    }
+  }
+  createPotion()
+
+  socket.on('howManyPotion', function(boolean){
+    if(boolean){
+      howManyPotion--
+      createPotion()
+    }
   })
 });
 
