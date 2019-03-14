@@ -28,9 +28,14 @@ let config = {
 let bombs
 let bombCount = 0
 let bomb
+//potions
 let potions
+let potion
+let potionDestroy = false
+//platform
 let platforms
 let lava
+//commands
 let cursors
 let pointer
 //Physical params
@@ -109,6 +114,8 @@ function create() {
   lava = this.physics.add.staticGroup();
   //add physics to the bombs
   bombs = this.physics.add.group();
+  //add physics to the potions
+  potions = this.physics.add.group();
   //Function to generate platforms
   function createEarth(name, number, coodX, coodY, xSpacing, ySpacing, type, scale = 0.5) {
     for (let i = 0; i < number; i++) {
@@ -181,6 +188,8 @@ function create() {
   this.physics.add.collider(bombs, platforms, destroy)
   this.physics.add.collider(bombs, bombs, destroy)
   this.physics.add.collider(bombs, lava, destroy)
+  this.physics.add.collider(potions, platforms)
+  this.physics.add.collider(potions, lava)
 
   //////////////////////////////
   //Création des anims 
@@ -251,11 +260,15 @@ function create() {
   });
   //récéption des bombs
   this.socket.on('OtherBombs', function (boom) {
-    console.log("bomb id" + boom.id)
     bomb = bombs.create(boom.x, boom.y, 'bomb')
     bomb.setBounce(0.8)
     bomb.body.velocity.x = boom.vx
     bomb.body.velocity.y = boom.vy
+  })
+  //récéption des potions
+  this.socket.on('potions', function (pot) {
+    potion = potions.create(pot.x, pot.y, 'potion')
+    potion.setBounce(0.2)
   })
 }
 
@@ -274,6 +287,9 @@ function addPlayer(self, playerInfo) {
   //créer les collisions avec les bombs
   self.physics.add.collider(player1, bombs, explode)
   self.physics.add.collider(player1, lava, burn)
+  self.physics.add.collider(player1, potions, heal)
+  //chargeur de bombe
+  player1.chargeur = 10;
 }
 
 function addOtherPlayers(self, playerInfo) {
@@ -289,6 +305,7 @@ function addOtherPlayers(self, playerInfo) {
 // Création de bomb
 function fire() {
   if(player1.state >= 0){
+  player1.chargeur -= 1
   bomb = bombs.create(player1.x, player1.y, 'bomb')
   bomb.setBounce(0.8)
   //bomb.setCollideWorldBounds(false)
@@ -305,6 +322,15 @@ function fire() {
   }
   //setTimeout(() => bomb.destroy(), 4020);
   return (bomb, bombX, bombY, bombVeloX, bombVeloY)
+}
+//////////////////////
+function heal(){
+  if(player1.state<=4){
+    player1.state +=1
+  } 
+  potion.destroy()
+  potionDestroy = true
+  return potionDestroy
 }
 //////////////////////
 //KABOOM
@@ -342,6 +368,7 @@ function explode(player, bomb) {
 //Die 
 function die(player) {
   if (player.state < 0) {
+    player.chargeur = 10;
     player.x = 0
     player.y = 0
     player.body.enable = false
@@ -415,7 +442,6 @@ function update() {
     function animatedOther() {
       otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (otherPlayer.input == "left") {
-          console.log("state = " + otherPlayer.state)
           for (let i = 0; i < 6; i++) {
             if (otherPlayer.state == i) {
               otherPlayer.anims.play(`left${i}`, true);
@@ -447,8 +473,10 @@ function update() {
     }
     //permet de créer les bombes au click
     if (pointer.justDown) {
-      fire()
-      this.socket.emit('bombs', { x: bombX, y: bombY, vx: bombVeloX, vy: bombVeloY, name: bomb.name, id: bomb.id })
+      if(chargeur > 0){
+        fire()
+        this.socket.emit('bombs', { x: bombX, y: bombY, vx: bombVeloX, vy: bombVeloY, name: bomb.name, id: bomb.id })
+      }
     }
     ///////////////////////
     // emit player movement
@@ -471,6 +499,11 @@ function update() {
     }
     if (bomb && bomb.y >= 1440){
       bomb.destroy();
+    }
+    //heal generation
+    if(potionDestroy){
+      this.socket.emit('howManyPotion',true)
+      potionDestroy = false
     }
   }
 }
