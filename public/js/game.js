@@ -473,7 +473,7 @@ function update() {
     }
     //permet de créer les bombes au click
     if (pointer.justDown) {
-      if(chargeur > 0){
+      if(player1.chargeur > 0){
         fire()
         this.socket.emit('bombs', { x: bombX, y: bombY, vx: bombVeloX, vy: bombVeloY, name: bomb.name, id: bomb.id })
       }
