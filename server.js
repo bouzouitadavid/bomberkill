@@ -16,6 +16,11 @@ let potion ={
   y : ""
 }
 let howManyPotion = 0
+let chargeur ={
+  x:"",
+  y:""
+}
+let howManyChargeur = 0
 
 app.use(express.static(__dirname + '/public'));
 
@@ -83,6 +88,23 @@ io.on('connection', function (socket) {
     if(boolean){
       howManyPotion--
       createPotion()
+    }
+  })
+
+  const createChargeur=()=>{
+    if(howManyChargeur <1){
+      chargeur.x = Math.floor(Math.random() * Math.floor(2))==0?Math.floor(Math.random() * Math.floor(1000)): -(Math.floor(Math.random() * Math.floor(1400)))
+      chargeur.y = Math.floor(Math.random() * Math.floor(2))==0?-1400:0
+      socket.emit('chargeurs', chargeur)
+      return howManyChargeur++
+    }
+  }
+  createChargeur()
+
+  socket.on('howManyChargeur', function(boolean){
+    if(boolean){
+      howManyChargeur--
+      createChargeur()
     }
   })
 });
