@@ -525,7 +525,7 @@ function update() {
       this.socket.emit('howManyPotion',true)
       potionDestroy = false
     }
-    if (potion && potion.y>=1440){
+    if (potion.y>=1440){
       potion.destroy();
       potionDestroy = true
     }
@@ -534,7 +534,7 @@ function update() {
       this.socket.emit('howManyChargeur',true)
       chargeurDestroy = false
     }
-    if (chargeur && chargeur.y>=1440){
+    if (chargeur.y>=1440){
       chargeur.destroy();
       chargeurDestroy = true
     }
