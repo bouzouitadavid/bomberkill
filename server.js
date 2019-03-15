@@ -74,12 +74,15 @@ io.on('connection', function (socket) {
     bomb.vy = data.vy
     socket.broadcast.emit('OtherBombs', bomb)
   })
+
   const createPotion=()=>{
     if(howManyPotion <1){
       potion.x = Math.floor(Math.random() * Math.floor(2))==0?Math.floor(Math.random() * Math.floor(1000)): -(Math.floor(Math.random() * Math.floor(1400)))
       potion.y = Math.floor(Math.random() * Math.floor(2))==0?-1400:0
       socket.emit('potions', potion)
       return howManyPotion++
+    } else {
+      socket.emit('potions', potion)
     }
   }
   createPotion()
@@ -97,6 +100,8 @@ io.on('connection', function (socket) {
       chargeur.y = Math.floor(Math.random() * Math.floor(2))==0?-1400:0
       socket.emit('chargeurs', chargeur)
       return howManyChargeur++
+    } else {
+      socket.emit('chargeurs', chargeur)
     }
   }
   createChargeur()
