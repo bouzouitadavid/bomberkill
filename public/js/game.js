@@ -32,6 +32,10 @@ let bomb
 let potions
 let potion
 let potionDestroy = false
+//chargeurs
+let chargeurs
+let chargeur
+let chargeurDestroy = false
 //platform
 let platforms
 let lava
@@ -88,7 +92,6 @@ function preload() {
   this.load.image('plantpie', 'assets/PNG/volcano_pack_74.png');
   this.load.image('star', 'assets/star.png');
   this.load.image('bomb', 'assets/bomb.png');
-  this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
   this.load.spritesheet('sticky-run0', 'assets/sticky-run0.png', { frameWidth: 32, frameHeight: 48 });
   this.load.spritesheet('sticky-run1', 'assets/sticky-run1.png', { frameWidth: 32, frameHeight: 48 });
   this.load.spritesheet('sticky-run2', 'assets/sticky-run2.png', { frameWidth: 32, frameHeight: 48 });
@@ -97,7 +100,7 @@ function preload() {
   this.load.spritesheet('sticky-run5', 'assets/sticky-run6.png', { frameWidth: 32, frameHeight: 48 });
   this.load.image('potion', 'assets/potion.png');
   this.load.image('cross', 'assets/cross1.png');
-  this.load.image('explosion', 'assets/explosion.png');
+  // this.load.image('explosion', 'assets/explosion.png');
 };
 ////////////////////
 //Element creating//
@@ -116,6 +119,8 @@ function create() {
   bombs = this.physics.add.group();
   //add physics to the potions
   potions = this.physics.add.group();
+  //add physics to the chargeurs
+  chargeurs = this.physics.add.group();
   //Function to generate platforms
   function createEarth(name, number, coodX, coodY, xSpacing, ySpacing, type, scale = 0.5) {
     for (let i = 0; i < number; i++) {
@@ -190,6 +195,8 @@ function create() {
   this.physics.add.collider(bombs, lava, destroy)
   this.physics.add.collider(potions, platforms)
   this.physics.add.collider(potions, lava)
+  this.physics.add.collider(chargeurs, platforms)
+  this.physics.add.collider(chargeurs, lava)
 
   //////////////////////////////
   //Création des anims 
@@ -270,10 +277,15 @@ function create() {
     potion = potions.create(pot.x, pot.y, 'potion')
     potion.setBounce(0.2)
   })
+  //récéption des chageurs
+  this.socket.on('chargeurs', function (charge) {
+    chargeur = chargeurs.create(charge.x, charge.y, 'star')
+    chargeur.setBounce(0.2)
+  })
 }
 
 function addPlayer(self, playerInfo) {
-  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude')
+  player1 = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'sticky-run5')
   // congif player/player
   player1.isDead = "false"
   player1.state = 5
@@ -288,12 +300,13 @@ function addPlayer(self, playerInfo) {
   self.physics.add.collider(player1, bombs, explode)
   self.physics.add.collider(player1, lava, burn)
   self.physics.add.collider(player1, potions, heal)
+  self.physics.add.collider(player1, chargeurs, charge)
   //chargeur de bombe
   player1.chargeur = 10;
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'dude')
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'sticky-run5')
   otherPlayer.playerId = playerInfo.playerId
   otherPlayers.add(otherPlayer)
   self.physics.add.collider(otherPlayers, platforms)
@@ -331,6 +344,13 @@ function heal(){
   potion.destroy()
   potionDestroy = true
   return potionDestroy
+}
+//////////////////////
+function charge(){
+  player1.chargeur += 10
+  chargeur.destroy()
+  chargeurDestroy = true
+  return chargeurDestroy
 }
 //////////////////////
 //KABOOM
@@ -504,6 +524,19 @@ function update() {
     if(potionDestroy){
       this.socket.emit('howManyPotion',true)
       potionDestroy = false
+    }
+    if (potion && potion.y>=1440){
+      potion.destroy();
+      potionDestroy = true
+    }
+    //charge generation
+    if(chargeurDestroy){
+      this.socket.emit('howManyChargeur',true)
+      chargeurDestroy = false
+    }
+    if (chargeur && chargeur.y>=1440){
+      chargeur.destroy();
+      chargeurDestroy = true
     }
   }
 }
