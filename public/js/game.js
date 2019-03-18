@@ -186,6 +186,7 @@ function create() {
   q = this.input.keyboard.addKey("q")
   d = this.input.keyboard.addKey("d")
   e = this.input.keyboard.addKey("e")
+  a = this.input.keyboard.addKey("a")
   m = this.input.keyboard.addKey("m")
   pointer = this.input.activePointer
   ////////////////////////
@@ -520,6 +521,14 @@ function update() {
     if (bomb && bomb.y >= 1440){
       bomb.destroy();
     }
+    //si un autre joueur a détruit la bombe
+    this.socket.on("OtherPlayerTakeThePotion", function (boolean){
+      if (boolean){
+        potion.destroy()
+        console.log("The potion as been taken")
+        return potionDestroy
+      }
+    })
     //heal generation
     if(potionDestroy){
       this.socket.emit('howManyPotion',true)

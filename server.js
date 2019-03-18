@@ -89,6 +89,8 @@ io.on('connection', function (socket) {
 
   socket.on('howManyPotion', function(boolean){
     if(boolean){
+      //Emit the information to the others players
+      socket.broadcast.emit("OtherPlayerTakeThePotion", true)
       howManyPotion--
       createPotion()
     }
